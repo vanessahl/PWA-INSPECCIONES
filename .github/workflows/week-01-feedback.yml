@@ -8,6 +8,11 @@ on:
       - week-01-final
   pull_request:
   workflow_dispatch:
+  inputs:
+      commit_sha:
+        description: "SHA del commit a evaluar"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -23,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit_sha || github.sha }}
       - name: Use Node.js 22.22.0
         uses: actions/setup-node@v4
         with:
