@@ -20,7 +20,7 @@
 
 - Nombre: Jessica Juarez Rodriguez 
 
-- Repositorio y commit evaluado: https://github.com/vanessahl/PWA-INSPECCIONES.git, b47dbdf743863d02a090bb1faafdd84604cd7f0f
+- Repositorio y commit evaluado: https://github.com/vanessahl/PWA-INSPECCIONES.git, d4d6c9e8c9a473db2e4f3c46c04e306309c8a8d1
 
 - Mi contribución concreta: Redacté y revisé los apartados “Problema y contexto” y “Usuarios y escenarios” de docs/requirements.md, definiendo la problemática de las inspecciones y los usuarios que utilizarán la aplicación.
 
