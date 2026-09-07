@@ -1,0 +1,20 @@
+# Dependencias
+node_modules/
+
+# Build outputs
+.next/
+out/
+
+# Verificaciones locales
+reports/
+
+# Variables de entorno
+.env
+.env.*
+
+# Logs
+npm-debug.log*
+*.log
+
+# Sistema
+.DS_Store
