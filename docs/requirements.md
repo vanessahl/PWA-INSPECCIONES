@@ -36,40 +36,53 @@ Resultado observable futuro: una prueba de red desconectada permite crear y volv
 
 ## 3. Requisitos funcionales
 
-- **RF-01:** El sistema debe mostrar una lista de inspecciones recientes con ubicación, fecha, responsable, estado y número de hallazgos.
-  *Criterio de aceptación:* al cargar `/` se muestran exactamente 3 registros sintéticos con esos 5 campos visibles.
+### RF-01. Mostrar inspecciones sinteticas
 
-- **RF-02:** El sistema debe identificar visualmente el estado de cada inspección (por ejemplo "Sin incidencias" o "Requiere atención").
-  *Criterio de aceptación:* cada tarjeta de inspección muestra una etiqueta de estado distinguible visualmente (color/badge).
+La aplicacion debe mostrar una lista de inspecciones recientes usando exclusivamente el conjunto sintetico incluido en el repositorio.
 
-- **RF-03:** El sistema debe mostrar el número de hallazgos por inspección.
-  *Criterio de aceptación:* la inspección del Laboratorio de Electrónica muestra el valor "2" en el campo Hallazgos.
+**Aceptacion:** al abrir `http://localhost:3000` se muestran exactamente tres registros: Laboratorio de Redes, Laboratorio de Electronica y Laboratorio de Software.
 
-- **RF-04:** El sistema debe indicar el estado general del starter (ej. "ejecutable · PWA aún no implementada").
-  *Criterio de aceptación:* la cabecera de la pantalla principal muestra un badge con el estado actual del proyecto.
+### RF-02. Mostrar resumen por inspeccion
+
+Cada registro debe mostrar ubicacion, fecha, responsable sintetico, estado, cantidad de hallazgos y resumen.
+
+**Aceptacion:** cada una de las tres tarjetas visibles contiene los seis campos y el registro de Electronica muestra estado "Requiere atencion" y `2` hallazgos.
+
+### RF-03. Identificar el caracter sintetico de la informacion
+
+La interfaz debe indicar que los datos de demostracion son sinteticos.
+
+**Aceptacion:** la pantalla incluye el texto que informa que los datos mostrados son sinteticos y los nombres de responsables usan seudonimos como "Tecnica A" y "Tecnico B".
+
+### RF-04. Base para operacion offline futura
+
+La arquitectura futura debe permitir que un tecnico consulte datos previamente almacenados y registre inspecciones pendientes sin red, para sincronizarlas al recuperar conectividad.
+
+**Aceptacion:** antes de implementar la funcionalidad, existe una decision arquitectonica documentada que selecciona la estrategia PWA y define la prueba offline y de sincronizacion para semanas posteriores.
 
 ## 4. Requisitos no funcionales
 
-- **RNF-01 (Reproducibilidad):** el proyecto debe iniciar sin errores con `npm ci && npm run dev` en cualquier máquina con Node 20 LTS.
-- **RNF-02 (Verificación automatizada):** `make verify` debe ejecutarse sin errores y generar `reports/verification.json`.
-- **RNF-03 (Accesibilidad):** los textos deben tener suficiente contraste y las tarjetas deben ser legibles en pantalla de teléfono (viewport móvil).
-- **RNF-04 (Seguridad y privacidad):** no se debe incluir ningún dato real de personas, laboratorios o estudiantes; todos los datos son sintéticos.
-- **RNF-05 (Rendimiento):** la pantalla principal debe cargar en menos de 2 segundos en entorno local.
-- **RNF-06 (Operación offline futura):** la arquitectura de datos debe permitir, en iteraciones posteriores, almacenar registros localmente sin conexión y sincronizarlos una sola vez al recuperar la red.
+| ID | Requisito medible | Criterio de medicion |
+| --- | --- | --- |
+| RNF-01 | Reproducibilidad | En Node.js 20 LTS, `npm ci`, `npm test` y `npm run build` terminan con codigo `0` en un clon limpio. |
+| RNF-02 | Accesibilidad | La estructura usa un `main`, encabezados en orden logico y cada seccion tiene un nombre accesible; una revision con Lighthouse debe obtener al menos 90/100 en accesibilidad cuando se incorpore a CI. |
+| RNF-03 | Seguridad | No se solicitan, transmiten ni almacenan credenciales o datos personales; `git ls-files` no debe incluir archivos `.env` con secretos. |
+| RNF-04 | Privacidad | Los datos del repositorio y de las demostraciones deben ser sinteticos; ninguna persona, matricula, correo, telefono, fotografia o ubicacion institucional exacta puede aparecer en codigo, documentos o evidencias. |
+| RNF-05 | Rendimiento | En una compilacion de produccion, la ruta inicial debe ser utilizable en menos de 3 s bajo una simulacion movil de red Fast 3G y CPU 4x; se medira con Lighthouse antes de la entrega final. |
+| RNF-06 | Operacion offline futura | La futura PWA debe permitir abrir la ultima lista sincronizada sin red y conservar localmente una inspeccion pendiente durante al menos un reinicio del navegador; la prueba se ejecutara con DevTools en modo Offline. |
 
-## 5. Datos sintéticos y límites
+## 5. Datos sinteticos y limites
 
-Para esta actividad se usan únicamente datos ficticios: nombres de laboratorios genéricos (Redes, Electrónica, Software), responsables identificados solo con "Técnica A/B/C" o "Técnico A/B/C", fechas de ejemplo y hallazgos numéricos inventados.
+La actividad usa tres inspecciones ficticias: Redes, Electronica y Software. Sus fechas, responsables, hallazgos y descripciones existen solo para demostrar la interfaz y se conservan en `src/lib/data/inspections.ts`.
 
-Está prohibido usar: nombres reales de personas, matrículas, correos institucionales, ubicaciones exactas de laboratorios reales, fotografías reales o cualquier dato que permita identificar a un estudiante, docente o espacio físico real de la universidad.
+Esta prohibido incluir nombres reales, matriculas, correos, telefonos, fotografias identificables, credenciales, ubicaciones exactas, inventarios reales, direcciones IP internas o resultados de inspecciones reales. Los ejemplos futuros deben usar seudonimos, lugares genericos y observaciones ficticias.
 
-## 6. Criterios de aceptación de la Semana 1
+## 6. Criterios de aceptacion de la Semana 1
 
-| Entrega | Comando/prueba de verificación |
-|---|---|
-| La app inicia correctamente | `npm ci && npm run dev` → pantalla visible en `localhost:3000` |
-| Se muestran 3 inspecciones sintéticas con los 5 campos | Inspección visual en navegador |
-| El proyecto pasa la verificación local | `make verify` → genera `reports/verification.json` sin errores |
-| El proyecto pasa las pruebas públicas | `bash public-tests/check.sh` sin errores |
-| El proyecto es reproducible en CI | Ejecución en verde de GitHub Actions |
-| Evidencia individual entregada | `evidence/individual.md` completo |
+| Entrega | Evidencia de aceptacion |
+| --- | --- |
+| Aplicacion ejecutable | Ejecutar `npm run dev`, abrir `http://localhost:3000` y comprobar el contador `3 registros` junto con las tres tarjetas. |
+| Datos sinteticos | Revisar `src/lib/data/inspections.ts` y comprobar que contiene tres registros de demostracion, sin identificadores personales reales. |
+| Requisitos | Revisar este documento: contiene problema, usuarios, dos escenarios, RF con aceptacion, RNF medibles, limites y datos sinteticos. |
+| Decision arquitectonica | Revisar `docs/decision-record.md`: compara cuatro alternativas, selecciona una y define consecuencias, riesgos y validacion. |
+| Verificacion automatizada | Ejecutar `npm test`, `npm run build` y `make verify`; los tres comandos deben terminar correctamente. |
