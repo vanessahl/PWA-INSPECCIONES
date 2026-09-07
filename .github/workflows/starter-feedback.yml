@@ -28,20 +28,18 @@ jobs:
           cache: npm
       - name: Reproducible install
         run: npm ci
-      - name: TypeScript build check
-        run: npm run typecheck
-      - name: Lint
-        run: npm run lint
-      - name: Public smoke tests
-        run: npm run test:smoke
-      - name: Public dependency gate
-        run: npm run audit:ci
-      - name: Expo Android bundle
-        run: npm run bundle:release
-      - name: Upload public build
+      - name: Starter tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Starter verification
+        run: npm run verify
+      - name: Upload verification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: starter-public-build
+          name: starter-week-01-evidence
           if-no-files-found: warn
-          path: dist/export/**
+          path: |
+            reports/verification.json
+            evidence/individual.md
