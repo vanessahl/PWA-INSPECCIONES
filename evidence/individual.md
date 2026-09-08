@@ -52,7 +52,7 @@
 
 ## Semana 2 - Jessica Juarez Rodriguez
 
--Commit SHA:
+-Commit SHA: e4207667d8894b5d01c1ef2a20de2826ce9b4e32
 
 -Lo que hice: Hice el shell de la aplicación en src/components/app-shell.tsx. También hice algunos cambios en src/app/page.tsx y src/app/layout.tsx. Agregué el archivo public/manifest.webmanifest y unos iconos.
 
