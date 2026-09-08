@@ -7,11 +7,14 @@ const required = [
   "package-lock.json",
   "src/app/layout.tsx",
   "src/app/page.tsx",
+  "src/components/app-shell.tsx",
   "src/app/globals.css",
   "src/lib/data/inspections.ts",
+  "public/manifest.webmanifest",
   "docs/requirements.md",
   "docs/decision-record.md",
   "tests/starter.spec.mjs",
+  "tests/manifest.spec.ts",
   "evidence/individual.md"
 ];
 

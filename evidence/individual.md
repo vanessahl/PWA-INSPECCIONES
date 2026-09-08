@@ -49,3 +49,21 @@
 - Limitación o riesgo que encontré: Sobrescritura no deseada de archivos no rastreados (untracked) durante la sincronización del repositorio local y la imposibilidad de incluir datos o evidencia real por restricciones explícitas de privacidad (RNF-04 y Sección 5).
 
 - Uso de IA (herramienta, propósito, fragmentos influenciados y validación humana): Se utilizó ChatGPT para el diagnóstico y resolución de conflictos de ramas en Git (git remote, git clean y git pull), así como para el formateo estructurado de evidencias; los fragmentos influenciados corresponden a los comandos de terminal ejecutados para la limpieza del árbol de trabajo local y la redacción/estructuración del reporte de entrega.
+
+## Semana 2 - Jessica Juarez Rodriguez
+
+-Commit SHA:
+
+-Lo que hice: Hice el shell de la aplicación en src/components/app-shell.tsx. También hice algunos cambios en src/app/page.tsx y src/app/layout.tsx. Agregué el archivo public/manifest.webmanifest y unos iconos.
+
+-Decisión técnica: Utilicé un componente para tener la estructura principal de la aplicación y next/link para la navegación. También usé el parámetro estado en la URL para poder mostrar los estados de carga, error y vacío sin necesitar todavía un backend.
+
+-Pruebas que hice: Ejecuté npm ci, npm test, npm run build y npm run verify. Las pruebas pasaron, el proyecto compiló correctamente y la verificación mostró Starter verificable: PASS.
+
+-Qué se comprobó: Se comprobó que el manifest esté bien conectado, que la navegación funcione y que aparezcan los estados de carga, error y vacío. También se comprobó que el proyecto compile correctamente.
+
+-Lo que todavía falta: No se comprobó la instalación en todos los navegadores ni el funcionamiento sin internet.
+
+-Limitaciones: Por ahora no agregué service worker, caché, almacenamiento local ni sincronización, ya que eso no corresponde a esta semana.
+
+-Uso de IA: Utilicé ChatGPT para ayudarme con algunas partes del código y para revisar las pruebas. Después revisé los cambios y ejecuté las pruebas por mi cuenta.

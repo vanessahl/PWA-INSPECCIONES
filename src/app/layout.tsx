@@ -3,7 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Inspecciones de laboratorio",
-  description: "Proyecto base de Aplicaciones Web Progresivas"
+  description: "Shell instalable para inspecciones sintéticas de laboratorio",
+  manifest: "/manifest.webmanifest"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
