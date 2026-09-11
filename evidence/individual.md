@@ -67,3 +67,16 @@
 -Limitaciones: Por ahora no agregué service worker, caché, almacenamiento local ni sincronización, ya que eso no corresponde a esta semana.
 
 -Uso de IA: Utilicé ChatGPT para ayudarme con algunas partes del código y para revisar las pruebas. Después revisé los cambios y ejecuté las pruebas por mi cuenta.
+
+## Semana 2 - Angel Gabriel Guzman Miguel
+
+* **Nombre:** Angel Gabriel Guzman Miguel
+* **Repositorio y commit:** https://github.com/vanessahl/PWA-INSPECCIONES.git, 
+* **Commit SHA**
+* **Contribución:** Revisé que la aplicación funcionara correctamente y comprobé el manifest y los diferentes estados de la aplicación.
+* **Decisión técnica:** El `manifest.webmanifest` contiene la información de la PWA, como nombre, colores, iconos, idioma y modo de visualización.
+* **Comandos y resultados:** Ejecuté `npm ci`, `npm test`, `npm run build` y `npm run verify`. Las pruebas pasaron correctamente, la compilación fue exitosa y la verificación mostró `Starter verificable: PASS`.
+* **Qué comprueban:** Comprueban las pruebas del proyecto, el manifest y que la aplicación pueda compilarse. No comprueban todavía el funcionamiento offline.
+* **Limitación:** Todavía no se cuenta con service worker, caché ni sincronización.
+* **Uso de IA:** Utilicé ChatGPT para entender la actividad y revisar los resultados de las pruebas. Después comprobé los resultados personalmente.
+
