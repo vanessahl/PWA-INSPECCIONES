@@ -50,6 +50,9 @@
 
 - Uso de IA (herramienta, propósito, fragmentos influenciados y validación humana): Se utilizó ChatGPT para el diagnóstico y resolución de conflictos de ramas en Git (git remote, git clean y git pull), así como para el formateo estructurado de evidencias; los fragmentos influenciados corresponden a los comandos de terminal ejecutados para la limpieza del árbol de trabajo local y la redacción/estructuración del reporte de entrega.
 
+
+
+
 ## Semana 2 - Jessica Juarez Rodriguez
 
 -Commit SHA: e4207667d8894b5d01c1ef2a20de2826ce9b4e32
@@ -72,7 +75,7 @@
 
 * **Nombre:** Angel Gabriel Guzman Miguel
 * **Repositorio y commit:** https://github.com/vanessahl/PWA-INSPECCIONES.git, 
-* **Commit SHA**
+* **Commit SHA** 8933efc850b095c10c34661a8912e96c05683b1c
 * **Contribución:** Revisé que la aplicación funcionara correctamente y comprobé el manifest y los diferentes estados de la aplicación.
 * **Decisión técnica:** El `manifest.webmanifest` contiene la información de la PWA, como nombre, colores, iconos, idioma y modo de visualización.
 * **Comandos y resultados:** Ejecuté `npm ci`, `npm test`, `npm run build` y `npm run verify`. Las pruebas pasaron correctamente, la compilación fue exitosa y la verificación mostró `Starter verificable: PASS`.
@@ -80,3 +83,21 @@
 * **Limitación:** Todavía no se cuenta con service worker, caché ni sincronización.
 * **Uso de IA:** Utilicé ChatGPT para entender la actividad y revisar los resultados de las pruebas. Después comprobé los resultados personalmente.
 
+
+## Semana 2 - Vanessa Hernandez Lopez 
+
+-Commit SHA: 1fb227f5c4c1e95403c5a9be41e4447eed2f0fe7
+
+-Lo que hice: Realicé mejoras visuales en la pantalla principal de inspecciones. Actualicé el diseño de las tarjetas de inspección, encabezados, estados de carga, error y vacío, además de mejorar la distribución, espaciado, colores y apariencia general de la interfaz.
+
+-Decisión técnica: Se decidió modificar únicamente los estilos y la presentación visual de la pantalla, conservando la estructura y lógica existente de la aplicación. 
+
+-Pruebas que hice: Ejecuté npm ci, npm test, npm run build y npm run verify. Las pruebas pasaron, el proyecto compiló correctamente y la verificación mostró Starter verificable: PASS.
+
+-Qué se comprobó: Se comprobó que la aplicación continúa funcionando después de los cambios visuales, que las inspecciones se muestran correctamente y que los diferentes estados de la pantalla (cargando, error y sin registros) mantienen su funcionamiento. También se verificó que el proyecto continúa compilando y pasando las pruebas existentes.
+
+-Lo que todavía falta: No se comprobó la instalación en todos los navegadores ni el funcionamiento sin internet.
+
+-Limitaciones: Por ahora no agrego service worker, caché, almacenamiento local ni sincronización, ya que esas funcionalidades no corresponden a esta semana. 
+
+-Uso de IA: Utilicé: Utilicé IA, ChatGPT como apoyo para revisar la forma de aplicar y los cambios fueron revisados y adaptados al código actual del proyecto.
