@@ -2,7 +2,7 @@
 
 Starter oficial para la materia **Aplicaciones Web Progresivas**.
 
-Este repositorio es el proyecto común para las actividades de las semanas 1–13. Esta entrega agrega el shell instalable de Semana 2 sobre la base reproducible de Semana 1. Cada semana conservarás el mismo repositorio y agregarás únicamente la capacidad indicada por la actividad.
+Este repositorio es el proyecto común para las actividades de las semanas 1–13. Esta entrega agrega el service worker y la estrategia de caché de Semana 3 sobre el shell instalable de Semana 2. Cada semana conservarás el mismo repositorio y agregarás únicamente la capacidad indicada por la actividad.
 
 ## Requisitos locales
 
@@ -26,7 +26,7 @@ El shell incluye navegación accesible y estados reproducibles:
 - `http://localhost:3000/?estado=error`: estado de error.
 - `http://localhost:3000/?estado=vacio`: estado vacío.
 
-El manifest se encuentra en `/manifest.webmanifest` y se enlaza desde el layout de Next.js. Esta semana no implementa service worker, almacenamiento offline ni sincronización.
+El manifest se encuentra en `/manifest.webmanifest` y se enlaza desde el layout de Next.js. Semana 3 registra `/sw.js` desde el layout. La navegación usa red primero y una respuesta cacheada como fallback offline; los recursos GET del mismo origen usan caché primero. La estrategia completa está documentada en `docs/cache-strategy.md`. No se implementan todavía registros offline ni sincronización de datos.
 
 Antes de entregar ejecuta:
 
@@ -57,6 +57,9 @@ No uses datos reales de personas, laboratorios o estudiantes. Todo dato del star
 - `docs/`: documentación de decisiones y requisitos.
 - `scripts/verify.mjs`: verificación reproducible local.
 - `tests/`: pruebas del starter y del manifest.
+- `public/sw.js`: service worker con caché versionada y fallback offline.
+- `src/lib/pwa/register-service-worker.ts`: registro del service worker en el navegador.
+- `docs/cache-strategy.md`: políticas, actualización y límites de caché.
 
-El alcance de esta semana no incluye service worker, sincronización, autenticación ni datos reales.
+El alcance de esta semana no incluye sincronización, autenticación ni datos reales.
 

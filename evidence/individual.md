@@ -101,3 +101,17 @@
 -Limitaciones: Por ahora no agrego service worker, caché, almacenamiento local ni sincronización, ya que esas funcionalidades no corresponden a esta semana. 
 
 -Uso de IA: Utilicé: Utilicé IA, ChatGPT como apoyo para revisar la forma de aplicar y los cambios fueron revisados y adaptados al código actual del proyecto.
+
+## Semana 3 - Jessica Juarez Rodriguez
+
+- Commit SHA: pendiente del commit final de Semana 3.
+
+- Lo que hice: Implementé `public/sw.js`, conecté el registro desde `src/lib/pwa/register-service-worker.ts` y `src/app/layout.tsx`, y documenté la estrategia en `docs/cache-strategy.md`.
+
+- Decisión técnica: Usé una caché versionada, precarga del shell, estrategia network-first para navegaciones y cache-first para recursos GET del mismo origen. La actualización elimina cachés anteriores durante `activate` y solo permite `skipWaiting` mediante un mensaje explícito.
+
+- Pruebas que hice: Ejecuté `npm test`, `npm run build` y `npm run verify`; las pruebas de service worker y fallback offline comprueban los eventos, el registro, la versión de caché y la estrategia documentada.
+
+- Limitación: La primera visita necesita red y todavía no se almacenan inspecciones pendientes ni se sincronizan cambios.
+
+- Uso de IA: Utilicé ChatGPT como apoyo para estructurar el service worker, las pruebas y la documentación. Revisé el código, adapté la solución al proyecto y validé el resultado con los comandos indicados.

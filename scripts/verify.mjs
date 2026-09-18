@@ -11,10 +11,15 @@ const required = [
   "src/app/globals.css",
   "src/lib/data/inspections.ts",
   "public/manifest.webmanifest",
+  "public/sw.js",
+  "src/lib/pwa/register-service-worker.ts",
   "docs/requirements.md",
   "docs/decision-record.md",
+  "docs/cache-strategy.md",
   "tests/starter.spec.mjs",
   "tests/manifest.spec.ts",
+  "tests/service-worker.spec.ts",
+  "tests/offline.spec.ts",
   "evidence/individual.md"
 ];
 
