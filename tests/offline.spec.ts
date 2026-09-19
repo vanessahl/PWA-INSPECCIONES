@@ -7,8 +7,14 @@ const worker = await readFile(resolve(root, "public/sw.js"), "utf8");
 const strategy = await readFile(resolve(root, "docs/cache-strategy.md"), "utf8");
 
 assert.match(worker, /event\.request\.mode === "navigate"/);
-assert.match(worker, /catch\(\(\) => caches\.match\(event\.request\)/);
-assert.match(worker, /caches\.match\("\/"\)/);
+assert.match(
+  worker,
+  /catch\(\(\) =>\s*caches\.match\(event\.request\)\.then\(\(cached\) => cached \|\| caches\.match\("\/"\)\)\)/
+);
+assert.match(worker, /APP_SHELL\s*=\s*\[[\s\S]*?["']\/["']/);
+assert.match(worker, /event\.request\.method !== "GET"/);
+assert.match(worker, /requestUrl\.origin !== self\.location\.origin/);
+assert.match(worker, /if \(response\.ok\)/);
 assert.match(strategy, /Network first/i);
 assert.match(strategy, /offline/i);
 assert.match(strategy, /skipWaiting/i);

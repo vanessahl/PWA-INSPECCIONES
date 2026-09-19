@@ -115,3 +115,17 @@
 - Limitación: La primera visita necesita red y todavía no se almacenan inspecciones pendientes ni se sincronizan cambios.
 
 - Uso de IA: Utilicé ChatGPT como apoyo para estructurar el service worker, las pruebas y la documentación. Revisé el código, adapté la solución al proyecto y validé el resultado con los comandos indicados.
+
+## Semana 3 - Angel Gabriel Guzman Miguel
+
+- Commit SHA: []
+
+- Lo que hice: Revisé y reforcé las pruebas del service worker y del funcionamiento offline en `tests/service-worker.spec.ts` y `tests/offline.spec.ts`. También actualicé `scripts/verify.mjs` para comprobar que existan los eventos principales del service worker, su registro, el fallback offline y el versionado de caché.
+
+- Decisión técnica: Se utilizó una caché versionada para el shell de la aplicación. Para las navegaciones se aplica una estrategia network-first: primero intenta obtener la versión actual desde la red y, si no hay conexión, utiliza la página solicitada almacenada en caché o el fallback de la ruta `/`. Los recursos GET del mismo origen usan caché para mejorar el funcionamiento con conectividad intermitente.
+
+- Pruebas que hice: Ejecuté `npm ci`, `npm test`, `npm run build` y `npm run verify`. La instalación terminó correctamente con 28 paquetes agregados. Todas las pruebas pasaron: `starter.spec.mjs`, `manifest.spec.ts`, `service-worker.spec.ts` y `offline.spec.ts`. La compilación de producción terminó correctamente con Next.js 14.2.35. La verificación final mostró `Verificación de PWA: PASS`.
+
+- Limitación: Durante `npm ci` se reportaron 2 vulnerabilidades en dependencias, una alta y una crítica, que deben revisarse posteriormente con `npm audit`. Además, las pruebas verifican la lógica del service worker de forma automatizada, pero aún sería recomendable comprobar manualmente el comportamiento offline en distintos navegadores y dispositivos.
+
+- Uso de IA: Utilicé Codex/ChatGPT de OpenAI como apoyo para revisar la lógica del service worker, mejorar las pruebas automatizadas y estructurar la evidencia. Revisé personalmente los cambios y ejecuté los comandos de instalación, pruebas, compilación y verificación.
