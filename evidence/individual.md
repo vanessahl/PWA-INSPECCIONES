@@ -129,3 +129,18 @@
 - Limitación: Durante `npm ci` se reportaron 2 vulnerabilidades en dependencias, una alta y una crítica, que deben revisarse posteriormente con `npm audit`. Además, las pruebas verifican la lógica del service worker de forma automatizada, pero aún sería recomendable comprobar manualmente el comportamiento offline en distintos navegadores y dispositivos.
 
 - Uso de IA: Utilicé Codex/ChatGPT de OpenAI como apoyo para revisar la lógica del service worker, mejorar las pruebas automatizadas y estructurar la evidencia. Revisé personalmente los cambios y ejecuté los comandos de instalación, pruebas, compilación y verificación.
+
+
+## Semana 3 - Vanessa Hernandez Lopez 
+
+- Commit SHA:[bc8e69028bc3db28e6f9534e1a27c9447858d07c] 
+
+- Lo que hice: Implementé: Revisé y actualicé el archivo docs/cache-strategy.md para explicar la estrategia de caché y el funcionamiento offline. También revisé y corregí el README.md con la información necesaria para instalar, ejecutar y verificar el proyecto.
+
+- Decisión técnica: Se documentó el uso de Network First para las navegaciones y Cache First para otros recursos GET del mismo origen. También se aclaró que el funcionamiento offline depende de los recursos que ya estén guardados en caché.
+
+- Pruebas que hice: Ejecuté: Ejecuté npm ci, npm test, npm run build y npm run verify.
+
+- Limitación:La aplicación todavía no permite registrar nuevas inspecciones sin conexión ni sincronizar cambios cuando se recupera Internet.
+
+- Uso de IA: Utilicé IA como apoyo para revisar la documentación, organizar la información y mejorar la redacción de los archivos, pero los cambios se realizaron sobre el contenido y código real del proyecto.
