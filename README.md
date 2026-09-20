@@ -1,65 +1,100 @@
 # PWA de inspecciones de laboratorio
 
-Starter oficial para la materia **Aplicaciones Web Progresivas**.
+Proyecto realizado para la materia de **Aplicaciones Web Progresivas**.
 
-Este repositorio es el proyecto común para las actividades de las semanas 1–13. Esta entrega agrega el service worker y la estrategia de caché de Semana 3 sobre el shell instalable de Semana 2. Cada semana conservarás el mismo repositorio y agregarás únicamente la capacidad indicada por la actividad.
+Durante la Semana 3 se agregó el **Service Worker** y una estrategia de caché para mejorar el funcionamiento de la aplicación cuando no hay conexión.
 
-## Requisitos locales
+## Requisitos
 
-- Node.js 20 LTS o superior compatible con Next.js.
-- npm 10 o superior.
-- Git y una cuenta de GitHub.
+* Node.js 20 o superior
+* npm
+* Git
 
-## Arranque verificable
+## Instalación
+
+Primero instalar las dependencias:
 
 ```bash
 npm ci
+```
+
+## Ejecutar el proyecto
+
+Para iniciar la aplicación:
+
+```bash
 npm run dev
 ```
 
-Abre <http://localhost:3000>. La pantalla inicial muestra el shell de la aplicación y tres inspecciones sintéticas.
+Después abrir:
 
-El shell incluye navegación accesible y estados reproducibles:
-
-- `http://localhost:3000/`: lista de inspecciones.
-- `http://localhost:3000/?estado=cargando`: estado de carga.
-- `http://localhost:3000/?estado=error`: estado de error.
-- `http://localhost:3000/?estado=vacio`: estado vacío.
-
-El manifest se encuentra en `/manifest.webmanifest` y se enlaza desde el layout de Next.js. Semana 3 registra `/sw.js` desde el layout. La navegación usa red primero y una respuesta cacheada como fallback offline; los recursos GET del mismo origen usan caché primero. La estrategia completa está documentada en `docs/cache-strategy.md`. No se implementan todavía registros offline ni sincronización de datos.
-
-Antes de entregar ejecuta:
-
-```bash
-make verify
-bash public-tests/check.sh
+```text
+http://localhost:3000
 ```
 
-En Windows sin `make` o Bash, el equivalente reproducible es `npm run verify`. La verificación genera `reports/verification.json`; ese archivo y la corrida verde de GitHub Actions son la evidencia técnica del arranque.
+También se pueden probar los siguientes estados:
 
-## Flujo de trabajo del curso
+* `/?estado=cargando`
+* `/?estado=error`
+* `/?estado=vacio`
 
-1. Conserva este repositorio como tu proyecto personal y crea un repositorio privado en GitHub.
-2. Completa únicamente los entregables de la actividad de la semana.
-3. Haz cambios pequeños y descriptivos; no borres lo que ya funciona.
-4. Ejecuta `npm ci`, `npm test`, `npm run build` y `npm run verify`.
-5. Ejecuta GitHub Actions sobre el SHA final y conserva el enlace de esa corrida.
-6. Entrega en Classroom la URL del repositorio, el SHA exacto evaluado, el enlace a Actions y `evidence/individual.md`.
+## Service Worker
 
-No uses datos reales de personas, laboratorios o estudiantes. Todo dato del starter es sintético.
+El Service Worker se encuentra en:
 
-## Estructura inicial
+```text
+public/sw.js
+```
 
-- `src/app/`: aplicación Next.js con App Router y página de inspecciones.
-- `src/components/app-shell.tsx`: navegación y marco común de la aplicación.
-- `public/manifest.webmanifest`: metadatos del shell instalable.
-- `src/lib/data/`: datos sintéticos de inspecciones.
-- `docs/`: documentación de decisiones y requisitos.
-- `scripts/verify.mjs`: verificación reproducible local.
-- `tests/`: pruebas del starter y del manifest.
-- `public/sw.js`: service worker con caché versionada y fallback offline.
-- `src/lib/pwa/register-service-worker.ts`: registro del service worker en el navegador.
-- `docs/cache-strategy.md`: políticas, actualización y límites de caché.
+Y su registro está en:
 
-El alcance de esta semana no incluye sincronización, autenticación ni datos reales.
+```text
+src/lib/pwa/register-service-worker.ts
+```
 
+La aplicación utiliza:
+
+* **Network First** para las navegaciones.
+* **Cache First** para otros recursos `GET` del mismo origen.
+* Caché inicial para los recursos principales de la aplicación.
+
+La estrategia completa está explicada en:
+
+```text
+docs/cache-strategy.md
+```
+
+## Funcionamiento offline
+
+La aplicación puede utilizar recursos que ya fueron guardados en caché.
+
+La primera visita necesita conexión, y actualmente no se pueden registrar nuevas inspecciones sin conexión ni sincronizar cambios posteriormente.
+
+## Verificación
+
+Para comprobar que el proyecto funciona correctamente se ejecutan:
+
+```bash
+npm ci
+npm test
+npm run build
+npm run verify
+```
+
+También se puede revisar el comportamiento offline desde las herramientas de desarrollo del navegador.
+
+## Evidencia
+
+Para la entrega se debe conservar el commit correspondiente y, cuando aplique, el resultado de GitHub Actions.
+
+Los resultados de verificación se generan en:
+
+```text
+reports/verification.json
+```
+
+## Alcance de la Semana 3
+
+En esta semana se trabajó principalmente en el **Service Worker, la estrategia de caché, el funcionamiento básico offline y la documentación del proyecto**.
+
+El proyecto utiliza datos sintéticos y todavía no cuenta con sincronización de inspecciones offline.
