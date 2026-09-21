@@ -104,7 +104,7 @@
 
 ## Semana 3 - Jessica Juarez Rodriguez
 
-- Commit SHA: pendiente del commit final de Semana 3.
+- Commit SHA: 3b532f18e520c2be1cd4c576f45c256209db7c4b
 
 - Lo que hice: Implementé `public/sw.js`, conecté el registro desde `src/lib/pwa/register-service-worker.ts` y `src/app/layout.tsx`, y documenté la estrategia en `docs/cache-strategy.md`.
 
@@ -118,7 +118,7 @@
 
 ## Semana 3 - Angel Gabriel Guzman Miguel
 
-- Commit SHA: []
+- Commit SHA: 867b585d540bd0559de75d09cf677d7bc8aa6421
 
 - Lo que hice: Revisé y reforcé las pruebas del service worker y del funcionamiento offline en `tests/service-worker.spec.ts` y `tests/offline.spec.ts`. También actualicé `scripts/verify.mjs` para comprobar que existan los eventos principales del service worker, su registro, el fallback offline y el versionado de caché.
 
@@ -133,7 +133,7 @@
 
 ## Semana 3 - Vanessa Hernandez Lopez 
 
-- Commit SHA:[bc8e69028bc3db28e6f9534e1a27c9447858d07c] 
+- Commit SHA: bc8e69028bc3db28e6f9534e1a27c9447858d07c
 
 - Lo que hice: Implementé: Revisé y actualicé el archivo docs/cache-strategy.md para explicar la estrategia de caché y el funcionamiento offline. También revisé y corregí el README.md con la información necesaria para instalar, ejecutar y verificar el proyecto.
 
