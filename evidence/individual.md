@@ -144,3 +144,13 @@
 - Limitación:La aplicación todavía no permite registrar nuevas inspecciones sin conexión ni sincronizar cambios cuando se recupera Internet.
 
 - Uso de IA: Utilicé IA como apoyo para revisar la documentación, organizar la información y mejorar la redacción de los archivos, pero los cambios se realizaron sobre el contenido y código real del proyecto.
+
+## Semana 4 - Jessica Juarez Rodriguez
+
+- **Estudiante:** Jessica Juarez Rodriguez
+- **Commit SHA evaluado:** `98d609397e375c5fdf2377c3d8c637e2e3d8445c`.
+- **Decisión técnica que puedo explicar:** Usé CSR para el listado de inspecciones porque la información se carga desde el navegador. Para el detalle usé SSR, que carga la información desde el servidor.
+- **Prueba que ejecuté y resultado:** Ejecuté `npm test`, `npm run build` y `npm run verify`. Las pruebas pasaron y la verificación terminó con **PASS**. No pude usar `make verify` porque no tengo GNU Make instalado en Windows.
+- **Limitación o fallo que encontré:** Los datos siguen siendo de ejemplo y no se consulta una API real.
+- **Cambio que puedo explicar o modificar:** Puedo explicar y modificar cómo se carga el listado y el detalle, y las pruebas de `tests/rendering.spec.ts`.
+- **Uso de IA:** Usé Claude como ayuda con el código, las pruebas y la documentación. Revisé los cambios y ejecuté las pruebas, el build y la verificación.
