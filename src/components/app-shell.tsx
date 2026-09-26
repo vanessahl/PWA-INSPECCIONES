@@ -20,6 +20,7 @@ export function AppShell({ children }: AppShellProps) {
         </Link>
         <nav aria-label="Navegación principal" className="app-nav">
           <Link href="/">Inicio</Link>
+          <Link href="/inspecciones">Inspecciones</Link>
           {stateLinks.map((link) => (
             <Link href={link.href} key={link.href}>{link.label}</Link>
           ))}

@@ -4,6 +4,8 @@ Proyecto realizado para la materia de **Aplicaciones Web Progresivas**.
 
 Durante la Semana 3 se agregó el **Service Worker** y una estrategia de caché para mejorar el funcionamiento de la aplicación cuando no hay conexión.
 
+Durante la Semana 4 se comparan dos rutas de renderizado: el listado `/inspecciones` usa CSR y el detalle `/inspecciones/[id]` usa SSR. La decisión está documentada en `docs/rendering-decision.md`.
+
 ## Requisitos
 
 * Node.js 20 o superior
@@ -37,6 +39,11 @@ También se pueden probar los siguientes estados:
 * `/?estado=cargando`
 * `/?estado=error`
 * `/?estado=vacio`
+* `/inspecciones`
+* `/inspecciones?estado=error`
+* `/inspecciones?estado=vacio`
+* `/inspecciones/inspection-002`
+* `/inspecciones/id-inexistente`
 
 ## Service Worker
 
@@ -79,9 +86,12 @@ npm ci
 npm test
 npm run build
 npm run verify
+make verify
 ```
 
 También se puede revisar el comportamiento offline desde las herramientas de desarrollo del navegador.
+
+La prueba de renderizado se ejecuta dentro de `npm test` y valida que el listado sea CSR, que el detalle sea SSR y que existan los estados de carga y error.
 
 ## Evidencia
 
@@ -92,6 +102,10 @@ Los resultados de verificación se generan en:
 ```text
 reports/verification.json
 ```
+
+## Alcance de la Semana 4
+
+En esta semana se agregaron rutas separadas para listado y detalle, con CSR para el listado, SSR para el detalle y estados reproducibles de carga, error y vacío. La evidencia individual registra el commit, la prueba ejecutada, la limitación y el uso declarado de IA.
 
 ## Alcance de la Semana 3
 

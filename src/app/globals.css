@@ -32,6 +32,8 @@ body {
 .app-nav a:hover, .app-nav a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
 
 .page-shell { margin: 0 auto; max-width: 1120px; padding: 40px 24px 24px; }
+.page-heading { margin-bottom: 34px; }
+.page-heading p:not(.eyebrow) { color: var(--muted); font-size: 1.05rem; line-height: 1.6; max-width: 680px; }
 .hero { background: linear-gradient(135deg, #172b62, #3156d3); border-radius: 22px; color: white; padding: 40px; }
 .eyebrow { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.11em; margin: 0 0 10px; text-transform: uppercase; }
 .hero .eyebrow { color: #c9d3ff; }
@@ -53,6 +55,11 @@ h3 { font-size: 1.2rem; margin: 20px 0 8px; }
 .badge-attention { background: var(--warning-soft); color: var(--warning); }
 .muted { color: var(--muted); font-size: .8rem; }
 .inspection-card p { color: var(--muted); line-height: 1.55; min-height: 75px; }
+.inspection-card .text-link { display: inline-block; margin-top: 18px; }
+.detail-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 7px 20px rgba(36, 55, 95, .06); max-width: 760px; padding: 32px; }
+.detail-panel h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin: 22px 0 12px; }
+.detail-summary { color: var(--muted); font-size: 1.05rem; line-height: 1.65; }
+.detail-list { margin-bottom: 26px; }
 .state-panel { align-items: center; background: var(--surface); border: 1px dashed var(--line); border-radius: 16px; display: flex; flex-direction: column; min-height: 250px; justify-content: center; padding: 32px; text-align: center; }
 .state-panel h2 { font-size: 1.35rem; margin: 14px 0 8px; }
 .state-panel p { color: var(--muted); margin-bottom: 18px; }
