@@ -22,6 +22,7 @@ assert.match(listPage, /No pudimos cargar las inspecciones/);
 assert.match(listPage, /estado.*error|error.*estado/s);
 assert.match(listPage, /estado.*vacio|vacio.*estado/s);
 assert.match(listPage, /href=\{`\/inspecciones\/\$\{inspection\.id\}`\}/);
+assert.match(listPage, /<time className="muted" dateTime=\{inspection\.date\}>/);
 assert.doesNotMatch(detailPage, /"use client"/);
 assert.match(detailPage, /params: \{ id: string \}/);
 assert.match(detailPage, /inspections\.find\(/);

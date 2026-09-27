@@ -154,3 +154,19 @@
 - **Limitación o fallo que encontré:** Los datos siguen siendo de ejemplo y no se consulta una API real.
 - **Cambio que puedo explicar o modificar:** Puedo explicar y modificar cómo se carga el listado y el detalle, y las pruebas de `tests/rendering.spec.ts`.
 - **Uso de IA:** Usé Claude como ayuda con el código, las pruebas y la documentación. Revisé los cambios y ejecuté las pruebas, el build y la verificación.
+
+## Semana 4 - Angel Gabriel Guzman Miguel
+
+- Estudiante: Angel Gabriel Guzman Miguel
+
+- Commit SHA evaluado: []
+
+- Decisión técnica que puedo explicar: Agregué una prueba de renderizado para comprobar que la fecha de cada inspección se muestre mediante el elemento semántico `<time>` y que use el atributo `dateTime` con el valor de `inspection.date`. Esto permite que navegadores, lectores de pantalla y herramientas automatizadas interpreten correctamente la fecha.
+
+- Prueba que ejecuté y resultado: Ejecuté `npm test` y todas las pruebas pasaron, incluyendo `rendering.spec.ts: PASS` con la nueva comprobación. También ejecuté `npm run verify` y el resultado fue `Verificación de PWA: PASS`. Ejecuté `npm run build` manualmente para confirmar que la compilación de producción no tuviera errores: [ESCRIBE AQUÍ TU RESULTADO].
+
+- Limitación o fallo diagnosticado: Node.js muestra una advertencia `MODULE_TYPELESS_PACKAGE_JSON` porque los archivos de prueba usan sintaxis de módulos ES, pero `package.json` no declara `"type": "module"`. No impide que las pruebas pasen, pero podría eliminarse evaluando el impacto de agregar esa configuración al proyecto.
+
+- Cambio que podría defender o modificar en vivo: Puedo explicar y modificar la aserción agregada en `tests/rendering.spec.ts`, que valida el uso de `<time className="muted" dateTime={inspection.date}>`. También puedo adaptar la prueba si cambia la estructura visual o semántica de las tarjetas de inspección.
+
+- Uso declarado de IA (herramienta, propósito, validación): Utilicé Codex/ChatGPT de OpenAI como apoyo para identificar una comprobación de renderizado adicional y redactar la aserción. Revisé personalmente el archivo modificado y validé el resultado mediante la ejecución de las pruebas.
