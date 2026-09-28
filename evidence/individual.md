@@ -170,3 +170,14 @@
 - Cambio que podría defender o modificar en vivo: Puedo explicar y modificar la aserción agregada en `tests/rendering.spec.ts`, que valida el uso de `<time className="muted" dateTime={inspection.date}>`. También puedo adaptar la prueba si cambia la estructura visual o semántica de las tarjetas de inspección.
 
 - Uso declarado de IA (herramienta, propósito, validación): Utilicé Codex/ChatGPT de OpenAI como apoyo para identificar una comprobación de renderizado adicional y redactar la aserción. Revisé personalmente el archivo modificado y validé el resultado mediante la ejecución de las pruebas.
+
+
+## Semana 4 - Vanessa Hernandez Lopez 
+
+- **Estudiante:** Vanessa Hernandez Lopez 
+- **Commit SHA evaluado:** `9aa7a32988cabedeea98d43a20b2e637efcf1b8a`.
+- **Decisión técnica que puedo explicar:** Revisé el comportamiento del listado y del detalle de las inspecciones. El listado /inspecciones se muestra como renderizado en cliente, mientras que el detalle de /inspecciones/inspection-002 se muestra como renderizado en servidor. También revisé cómo responde la aplicación cuando ocurre un error, cuando no hay inspecciones y cuando se solicita un identificador que no existe.
+- **Prueba que ejecuté y resultado:** Realicé pruebas manuales en Google Chrome con las rutas /inspecciones, /inspecciones?estado=error, /inspecciones?estado=vacio, /inspecciones/inspection-002 y /inspecciones/id-inexistente. Las cinco rutas respondieron y mostraron el contenido correspondiente a cada caso.
+- **Limitación o fallo que encontré:** Los datos que muestra la aplicación son sintéticos y de demostración. Además, el escenario de error indica que la consulta no está disponible y el estado vacío muestra que no hay inspecciones para mostrar.
+- **Cambio que puedo explicar o modificar:** Puedo explicar la documentación de las pruebas realizadas y el comportamiento de cada ruta. También puedo modificar el archivo docs/rendering-decision.md para actualizar los resultados de las pruebas manuales.
+- **Uso de IA:** Utilicé IA como apoyo para organizar y redactar la documentación de las pruebas. Yo realicé las pruebas manualmente en el navegador y revisé que la información documentada correspondiera con lo que mostraba mi proyecto.
