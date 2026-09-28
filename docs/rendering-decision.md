@@ -41,3 +41,94 @@ La prueba de renderizado ya existía en el árbol local, aunque no estaba conect
 ## Validación
 
 Se ejecutan `npm ci`, `npm test`, `npm run build` y `make verify`. La prueba `tests/rendering.spec.ts` comprueba la frontera CSR/SSR, los estados de carga, los enlaces al detalle y los estados de error y vacío. GitHub Actions debe ejecutarse en el repositorio después de publicar el commit; no se puede confirmar un resultado remoto desde un árbol local sin publicar cambios.
+
+
+# Decisión de renderizado
+
+## Pruebas realizadas
+
+Para comprobar el funcionamiento de las páginas de inspecciones, se realizaron pruebas directamente desde el navegador utilizando las diferentes rutas indicadas. El objetivo fue revisar qué información se muestra en cada caso y verificar el comportamiento de la aplicación cuando existen registros, cuando ocurre un error, cuando no hay resultados y cuando se consulta una inspección que no existe.
+
+**Navegador utilizado:** Google Chrome.
+
+### 1. Listado de inspecciones
+
+**Ruta:** `/inspecciones`
+
+Al ingresar a esta dirección se muestra el listado de las inspecciones recientes. La página contiene información de demostración y trabaja con datos sintéticos.
+
+Se muestran **3 registros**:
+
+* **Laboratorio de Redes:** revisión visual de cableado, ventilación y estaciones de trabajo. Tiene 0 hallazgos y aparece como “Sin incidencias”.
+* **Laboratorio de Electrónica:** tiene 2 hallazgos y aparece como “Requiere atención”. El responsable es Técnico B.
+* **Laboratorio de Software:** comprobación de equipo, señalización y disponibilidad del espacio. Tiene 0 hallazgos y aparece como “Sin incidencias”.
+
+También se puede acceder al detalle de cada inspección mediante el botón **“Ver detalle”**.
+
+En la parte superior se indica **“Listado · renderizado en cliente”**, por lo que esta vista corresponde al renderizado del listado desde el cliente.
+
+### 2. Estado de error
+
+**Ruta:** `/inspecciones?estado=error`
+
+En esta ruta la aplicación muestra la interfaz principal de inspecciones, pero la consulta de los registros no está disponible.
+
+Se muestra el mensaje:
+
+**“No pudimos cargar las inspecciones”**
+
+Debajo se explica que la consulta no está disponible y se proporciona la opción **“Reintentar”** para volver a realizar el proceso desde el inicio.
+
+Esta prueba permite comprobar cómo responde la aplicación cuando ocurre un problema al intentar cargar la información.
+
+### 3. Estado vacío
+
+**Ruta:** `/inspecciones?estado=vacio`
+
+En esta ruta se muestra la sección de inspecciones recientes, pero en lugar de presentar los registros aparece el mensaje:
+
+**“No hay inspecciones”**
+
+También se indica que no se encontraron registros para mostrar en ese momento y se incluye el botón **“Volver al inicio”**.
+
+Este caso permite comprobar el comportamiento de la interfaz cuando no existen datos disponibles para mostrar al usuario.
+
+### 4. Detalle de una inspección existente
+
+**Ruta:** `/inspecciones/inspection-002`
+
+Al ingresar a esta dirección se muestra correctamente el detalle de la inspección correspondiente al **Laboratorio de Electrónica**.
+
+La información mostrada es:
+
+* **Estado:** Requiere atención.
+* **Fecha:** 2026-08-27.
+* **Responsable:** Técnico B.
+* **Hallazgos:** 2.
+* **Identificador:** inspection-002.
+
+La página también incluye la opción **“Volver al listado”** para regresar a la pantalla principal de inspecciones.
+
+En esta vista aparece la indicación **“Detalle · renderizado en servidor”**, por lo que se identifica como una página de detalle renderizada en servidor.
+
+### 5. Identificador de inspección inexistente
+
+**Ruta:** `/inspecciones/id-inexistente`
+
+Al ingresar un identificador que no corresponde a ninguna inspección existente, la aplicación muestra una página informando que el registro no fue encontrado.
+
+El mensaje principal es:
+
+**“Inspección no encontrada”**
+
+También se indica que no existe un registro sintético con el identificador solicitado. La página proporciona el botón **“Volver al listado”** para regresar a la lista de inspecciones.
+
+Este comportamiento permite comprobar que la aplicación contempla el caso en el que el usuario intenta consultar un registro que no existe.
+
+## Conclusión
+
+Después de realizar las pruebas, se comprobó que las diferentes rutas de la aplicación responden de acuerdo con el escenario solicitado. El listado permite consultar las inspecciones disponibles, mientras que las rutas de error y estado vacío muestran mensajes específicos para informar al usuario sobre lo que está sucediendo.
+
+También se comprobó el acceso al detalle de una inspección existente y el manejo de un identificador inexistente. Con estas pruebas se pudo verificar que la aplicación cuenta con diferentes estados de interfaz y que cada uno presenta información y opciones de navegación acordes con el caso.
+
+En general, las pruebas realizadas permitieron identificar la diferencia entre el listado, que se muestra como **renderizado en cliente**, y el detalle de una inspección, que se muestra como **renderizado en servidor**.
