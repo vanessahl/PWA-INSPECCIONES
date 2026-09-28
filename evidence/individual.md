@@ -159,11 +159,11 @@
 
 - Estudiante: Angel Gabriel Guzman Miguel
 
-- Commit SHA evaluado: []
+- Commit SHA evaluado: `0a8a9e7539b311768620a1b967f180bd0dfa119a`
 
 - Decisión técnica que puedo explicar: Agregué una prueba de renderizado para comprobar que la fecha de cada inspección se muestre mediante el elemento semántico `<time>` y que use el atributo `dateTime` con el valor de `inspection.date`. Esto permite que navegadores, lectores de pantalla y herramientas automatizadas interpreten correctamente la fecha.
 
-- Prueba que ejecuté y resultado: Ejecuté `npm test` y todas las pruebas pasaron, incluyendo `rendering.spec.ts: PASS` con la nueva comprobación. También ejecuté `npm run verify` y el resultado fue `Verificación de PWA: PASS`. Ejecuté `npm run build` manualmente para confirmar que la compilación de producción no tuviera errores: [ESCRIBE AQUÍ TU RESULTADO].
+- Prueba que ejecuté y resultado: Ejecuté `npm ci`, `npm test`, `npm run verify` y `npm run build`. Todas las pruebas pasaron, incluyendo `rendering.spec.ts: PASS`; la verificación mostró `Verificación de PWA: PASS` y la compilación de producción terminó correctamente con Next.js 14.2.35.
 
 - Limitación o fallo diagnosticado: Node.js muestra una advertencia `MODULE_TYPELESS_PACKAGE_JSON` porque los archivos de prueba usan sintaxis de módulos ES, pero `package.json` no declara `"type": "module"`. No impide que las pruebas pasen, pero podría eliminarse evaluando el impacto de agregar esa configuración al proyecto.
 
