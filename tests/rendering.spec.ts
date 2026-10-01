@@ -13,6 +13,7 @@ const detailLoading = await readFile(
   "utf8"
 );
 const loadingState = await readFile(resolve(root, "src/components/loading-state.tsx"), "utf8");
+const syncEndpoint = await readFile(resolve(root, "src/app/api/inspecciones/sync/route.ts"), "utf8");
 
 assert.match(listPage, /^"use client";/);
 assert.match(listPage, /useEffect\(/);
@@ -23,6 +24,12 @@ assert.match(listPage, /estado.*error|error.*estado/s);
 assert.match(listPage, /estado.*vacio|vacio.*estado/s);
 assert.match(listPage, /href=\{`\/inspecciones\/\$\{inspection\.id\}`\}/);
 assert.match(listPage, /<time className="muted" dateTime=\{inspection\.date\}>/);
+assert.match(listPage, /<form className="sync-form" onSubmit=\{handleSubmit\}>/);
+assert.match(listPage, /enqueueInspection\(store, record\)/);
+assert.match(listPage, /registerOnlineSync\(/);
+assert.match(listPage, /Pendiente de sincronizar/);
+assert.match(syncEndpoint, /idempotentResults\.get\(idempotencyKey\)/);
+assert.match(syncEndpoint, /status: 409/);
 assert.doesNotMatch(detailPage, /"use client"/);
 assert.match(detailPage, /params: \{ id: string \}/);
 assert.match(detailPage, /inspections\.find\(/);

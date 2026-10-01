@@ -181,3 +181,12 @@
 - **Limitación o fallo que encontré:** Los datos que muestra la aplicación son sintéticos y de demostración. Además, el escenario de error indica que la consulta no está disponible y el estado vacío muestra que no hay inspecciones para mostrar.
 - **Cambio que puedo explicar o modificar:** Puedo explicar la documentación de las pruebas realizadas y el comportamiento de cada ruta. También puedo modificar el archivo docs/rendering-decision.md para actualizar los resultados de las pruebas manuales.
 - **Uso de IA:** Utilicé IA como apoyo para organizar y redactar la documentación de las pruebas. Yo realicé las pruebas manualmente en el navegador y revisé que la información documentada correspondiera con lo que mostraba mi proyecto.
+
+## Semana 5 - Jessica Juarez Rodriguez
+
+- **Commit SHA evaluado:** `aa859ed09364e43761d8727a9985fa246518b564`
+- **Contribución:** Implementé el esquema IndexedDB y la outbox durable para guardar inspecciones sintéticas, la cola de sincronización con backoff, timeout y leases recuperables, y pruebas deterministas de reintentos, duplicados y conflictos.
+- **Decisión técnica:** Separé la lógica de sincronización de la persistencia mediante `SyncStore`, usé IndexedDB en el navegador y una política last-write-wins que prefiere la versión remota si las fechas empatan.
+- **Pruebas ejecutadas y resultado:** Ejecuté `npm ci`, `npm test`, `npm run build` y `npm run verify`; instalación, pruebas, compilación y verificación finalizaron correctamente. `tests/sync.spec.ts` cubre IndexedDB simulado, transporte HTTP y endpoint; en navegador guardé una inspección conectada y otra sin conexión, y al restaurar la red ambas aparecieron sincronizadas. En Windows, `npm run verify` es el equivalente exacto de `make verify` según el Makefile.
+- **Limitación:** El endpoint remoto de demostración guarda datos en memoria y los pierde al reiniciar el servidor; no tiene autenticación y no debe usarse con datos reales.
+- **Uso de IA:** Utilicé Claude como apoyo para implementar y revisar el esquema, la cola, la política y las pruebas.

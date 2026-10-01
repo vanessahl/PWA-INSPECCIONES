@@ -350,7 +350,7 @@ export default function HomePage({ searchParams }: PageProps) {
               fontWeight: "600",
             }}
           >
-            ● Shell listo para instalar · Sin conexión offline todavía
+            ● Shell listo para instalar · Captura local disponible
           </span>
         </header>
 
