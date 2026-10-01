@@ -184,7 +184,7 @@
 
 ## Semana 5 - Jessica Juarez Rodriguez
 
-- **Commit SHA evaluado:** `aa859ed09364e43761d8727a9985fa246518b564`
+- **Commit SHA evaluado:** `061a869187a916dccf06b10429fc2c78c290d754`
 - **Contribución:** Implementé el esquema IndexedDB y la outbox durable para guardar inspecciones sintéticas, la cola de sincronización con backoff, timeout y leases recuperables, y pruebas deterministas de reintentos, duplicados y conflictos.
 - **Decisión técnica:** Separé la lógica de sincronización de la persistencia mediante `SyncStore`, usé IndexedDB en el navegador y una política last-write-wins que prefiere la versión remota si las fechas empatan.
 - **Pruebas ejecutadas y resultado:** Ejecuté `npm ci`, `npm test`, `npm run build` y `npm run verify`; instalación, pruebas, compilación y verificación finalizaron correctamente. `tests/sync.spec.ts` cubre IndexedDB simulado, transporte HTTP y endpoint; en navegador guardé una inspección conectada y otra sin conexión, y al restaurar la red ambas aparecieron sincronizadas. En Windows, `npm run verify` es el equivalente exacto de `make verify` según el Makefile.
