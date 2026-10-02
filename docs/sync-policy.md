@@ -15,6 +15,40 @@ La pantalla `/inspecciones` permite capturar datos sintéticos, guardarlos local
 5. Restaurar la red y observar que el evento `online` vacía la outbox y actualiza el estado.
 6. Reiniciar el servidor de desarrollo y notar que IndexedDB conserva el dato local, pero el almacén remoto simulado se reinicia.
 
+## Resultado de la prueba manual de sincronización
+
+Se realizó una prueba manual en el navegador desde la ruta `/inspecciones` para comprobar el comportamiento de la aplicación cuando existe conexión a internet y cuando el navegador trabaja sin conexión.
+
+### Prueba con conexión
+
+Primero se abrió la aplicación con conexión a internet y se capturó una inspección utilizando datos sintéticos. Después de guardar el registro, este apareció en la sección de inspecciones recientes y se mostró con el estado **Sincronizada**.
+Esto permitió comprobar que, cuando existe conexión disponible, la inspección puede guardarse y enviarse correctamente para su sincronización.
+
+### Prueba sin conexión
+
+Posteriormente se abrió DevTools y se activó la opción **Offline** desde la pestaña Network. Sin restaurar la conexión, se capturó y guardó una segunda inspección con datos sintéticos.
+La inspección se agregó correctamente a la lista de registros, pero su estado apareció como **Pendiente de sincronizar**. Esto indica que el registro pudo conservarse localmente aunque en ese momento no existía conexión disponible para completar el envío.
+
+### Restauración de la conexión
+
+Después se cambió nuevamente la configuración de red de DevTools de **Offline** a **Online**, sin realizar una recarga manual de la página.
+Después de unos segundos, la segunda inspección cambió de **Pendiente de sincronizar** a **Sincronizada**. Por lo tanto, se comprobó durante la prueba que la aplicación detecta la restauración de la conexión y procesa la inspección que había quedado pendiente.
+
+### Resultado obtenido
+
+| Situación             | Resultado observado                              |
+| --------------------- | ------------------------------------------------ |
+| Guardar con conexión  | La inspección quedó **Sincronizada**             |
+| Guardar sin conexión  | La inspección quedó **Pendiente de sincronizar** |
+| Restaurar la conexión | La inspección pendiente pasó a **Sincronizada**  |
+
+### Conclusión
+
+La prueba manual confirmó el flujo básico de persistencia y sincronización de la aplicación. Los registros pueden capturarse mientras existe conexión y también pueden guardarse localmente cuando el navegador está Offline. En este último caso, el registro permanece pendiente hasta que la conexión vuelve a estar disponible.
+
+En la prueba realizada, la sincronización se completó automáticamente después de restaurar la conexión, sin necesidad de volver a capturar la inspección. El resultado observado coincide con el comportamiento esperado descrito en esta política.
+
+
 ## Esquema local
 
 La base `pwa-inspecciones`, versión 1, contiene:
