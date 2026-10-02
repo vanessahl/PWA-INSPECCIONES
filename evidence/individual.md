@@ -190,3 +190,12 @@
 - **Pruebas ejecutadas y resultado:** Ejecuté `npm ci`, `npm test`, `npm run build` y `npm run verify`; instalación, pruebas, compilación y verificación finalizaron correctamente. `tests/sync.spec.ts` cubre IndexedDB simulado, transporte HTTP y endpoint; en navegador guardé una inspección conectada y otra sin conexión, y al restaurar la red ambas aparecieron sincronizadas. En Windows, `npm run verify` es el equivalente exacto de `make verify` según el Makefile.
 - **Limitación:** El endpoint remoto de demostración guarda datos en memoria y los pierde al reiniciar el servidor; no tiene autenticación y no debe usarse con datos reales.
 - **Uso de IA:** Utilicé Claude como apoyo para implementar y revisar el esquema, la cola, la política y las pruebas.
+
+## Semana 5 - Angel Gabriel Guzman Miguel
+
+- **Commit SHA evaluado:** [].
+- **Contribución:** Amplié `tests/sync.spec.ts` con casos del endpoint de sincronización para datos mal formados, solicitudes sin clave idempotente y conflictos de revisión. Las pruebas comprueban que los dos primeros casos devuelven HTTP 400 con un mensaje explicativo y que un conflicto devuelve HTTP 409 junto con la versión remota vigente.
+- **Decisión técnica:** Validé los límites del contrato HTTP en el endpoint, además de la cola local. Esto confirma que el servidor rechaza entradas antes de sincronizarlas y que quien llama recibe información suficiente para aplicar la política de resolución de conflictos.
+- **Pruebas ejecutadas y resultado:** Ejecuté `npm test`, `npm run build` y `npm run verify`. Las pruebas anteriores a sincronización pasaron (`starter`, `manifest`, `service-worker`, `offline` y `rendering`); este entorno bloqueó la ejecución de `tsx tests/sync.spec.ts` y el build al intentar crear procesos auxiliares (`spawn EPERM`). `npm run verify` finalizó con `Verificación de PWA: PASS`. Además, ejecuté el chequeo de tipos de `tests/sync.spec.ts` con TypeScript y terminó sin errores. Se debe repetir `npm test` y `npm run build` en una terminal local sin esa restricción antes de entregar.
+- **Limitación:** El endpoint remoto de demostración usa mapas en memoria; al reiniciar el proceso se pierden tanto los registros remotos como los resultados de idempotencia. No sustituye una base de datos compartida y persistente de producción.
+- **Uso de IA:** Utilicé Codex/ChatGPT de OpenAI como apoyo para identificar los casos límite y estructurar las aserciones. Revisé el contrato del endpoint, los cambios realizados y los resultados de las pruebas.

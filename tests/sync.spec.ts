@@ -151,6 +151,34 @@ const endpointTransport = createHttpSyncTransport("/api/inspecciones/sync", asyn
 assert.equal((await syncPending(endpointStore, endpointTransport, { now: () => now })).synced, 1,
   "sincroniza outbox contra el endpoint HTTP sintético");
 
+const missingKeyResponse = await syncRoute(new Request("http://localhost/api/inspecciones/sync", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({ inspection: fixture, updatedAt: new Date(now).toISOString(), expectedRevision: null })
+}));
+assert.equal(missingKeyResponse.status, 400, "rechaza peticiones sin clave idempotente");
+assert.match((await missingKeyResponse.json()).message, /clave idempotente/i);
+
+const malformedJsonResponse = await syncRoute(new Request("http://localhost/api/inspecciones/sync", {
+  method: "POST",
+  headers: { "content-type": "application/json", "idempotency-key": "synthetic-malformed-json-101" },
+  body: "{no-es-json}"
+}));
+assert.equal(malformedJsonResponse.status, 400, "rechaza JSON mal formado");
+assert.match((await malformedJsonResponse.json()).message, /cuerpo.*válido/i);
+
+const malformedRecordResponse = await syncRoute(new Request("http://localhost/api/inspecciones/sync", {
+  method: "POST",
+  headers: { "content-type": "application/json", "idempotency-key": "synthetic-malformed-record-101" },
+  body: JSON.stringify({
+    inspection: { ...fixture, findings: -1 },
+    updatedAt: "fecha-inválida",
+    expectedRevision: -1
+  })
+}));
+assert.equal(malformedRecordResponse.status, 400, "rechaza datos que no cumplen el esquema");
+assert.match((await malformedRecordResponse.json()).message, /no cumplen el esquema/i);
+
 const idempotentRequest = new Request("http://localhost/api/inspecciones/sync", {
   method: "POST",
   headers: { "content-type": "application/json", "idempotency-key": "synthetic-idempotency-101" },
@@ -174,6 +202,9 @@ const staleRevisionResponse = await syncRoute(new Request("http://localhost/api/
     updatedAt: new Date(now).toISOString(), expectedRevision: null })
 }));
 assert.equal(staleRevisionResponse.status, 409, "la revisión obsoleta responde conflicto");
-assert.equal((await staleRevisionResponse.json()).kind, "conflict");
+const staleConflict = await staleRevisionResponse.json();
+assert.equal(staleConflict.kind, "conflict");
+assert.equal(staleConflict.current.inspection.id, "inspection-001");
+assert.equal(staleConflict.current.revision, 1, "el conflicto devuelve la versión remota actual");
 
 console.log("sync.spec.ts: PASS");
