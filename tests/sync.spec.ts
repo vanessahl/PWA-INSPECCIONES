@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import "fake-indexeddb/auto";
 import { POST as syncRoute } from "../src/app/api/inspecciones/sync/route.ts";
-import { createHttpSyncTransport, enqueueInspection, syncPending } from "../src/lib/sync/queue.ts";
+import {
+  createHttpSyncTransport,
+  enqueueInspection,
+  registerOnlineSync,
+  syncPending
+} from "../src/lib/sync/queue.ts";
 import { chooseConflictWinner } from "../src/lib/sync/conflict-policy.ts";
 import {
   DATABASE_NAME,
@@ -206,5 +211,43 @@ const staleConflict = await staleRevisionResponse.json();
 assert.equal(staleConflict.kind, "conflict");
 assert.equal(staleConflict.current.inspection.id, "inspection-001");
 assert.equal(staleConflict.current.revision, 1, "el conflicto devuelve la versión remota actual");
+
+const previousWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+const previousNavigator = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+const eventTarget = new EventTarget();
+Object.defineProperty(globalThis, "window", { configurable: true, value: eventTarget });
+Object.defineProperty(globalThis, "navigator", { configurable: true, value: { onLine: true } });
+try {
+  const autoRetryStore = new MemoryStore();
+  await enqueueInspection(autoRetryStore, { ...fixture, id: "synthetic-auto-retry-101" });
+  let automaticAttempts = 0;
+  let stopAutoRetry = () => undefined;
+  const automaticRetryCompleted = new Promise<void>((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("El reintento automático no se ejecutó.")), 5000);
+    stopAutoRetry = registerOnlineSync(autoRetryStore, async () => {
+      automaticAttempts += 1;
+      if (automaticAttempts === 1) throw new Error("fallo transitorio sintético");
+      return { kind: "synced", revision: 1 };
+    }, {
+      onComplete: (summary) => {
+        if (summary.synced > 0) {
+          clearTimeout(timeout);
+          resolve();
+        }
+      }
+    });
+  });
+  try {
+    await automaticRetryCompleted;
+    assert.equal(automaticAttempts, 2, "reintenta automáticamente sin un nuevo evento online");
+  } finally {
+    stopAutoRetry();
+  }
+} finally {
+  if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow);
+  else Reflect.deleteProperty(globalThis, "window");
+  if (previousNavigator) Object.defineProperty(globalThis, "navigator", previousNavigator);
+  else Reflect.deleteProperty(globalThis, "navigator");
+}
 
 console.log("sync.spec.ts: PASS");

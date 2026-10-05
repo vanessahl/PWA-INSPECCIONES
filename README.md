@@ -102,6 +102,8 @@ También se puede revisar el comportamiento offline desde las herramientas de de
 La prueba de renderizado se ejecuta dentro de `npm test` y valida que el listado sea CSR, que el detalle sea SSR y que existan los estados de carga y error.
 Las pruebas de renderizado y sincronización forman parte de `npm test`; cubren el formulario, IndexedDB simulado, endpoint, duplicados, reintentos, conflictos y recuperación tras expirar un lease. Para la comprobación manual offline, desactiva la red desde DevTools, guarda otra inspección en `/inspecciones` y restablece la conexión para verla sincronizada.
 
+En esta revisión se ejecutaron `npm ci`, `npm test`, `npm run build` y `npm run verify`; todos terminaron correctamente. `npm ci` informó dos vulnerabilidades en dependencias (una alta y una crítica). Este entorno no tiene GNU Make ni GitHub CLI, y no fue posible despachar un workflow de Actions desde las herramientas disponibles; por eso el estado de Actions debe verificarse en GitHub cuando se publique el commit. `npm run verify` es el equivalente local exacto de `make verify`.
+
 ## Evidencia
 
 Para la entrega se debe conservar el commit correspondiente y, cuando aplique, el resultado de GitHub Actions.
@@ -118,9 +120,7 @@ En esta semana se agregaron rutas separadas para listado y detalle, con CSR para
 
 ## Alcance de la Semana 3
 
-En esta semana se trabajó principalmente en el **Service Worker, la estrategia de caché, el funcionamiento básico offline y la documentación del proyecto**.
-
-El proyecto utiliza datos sintéticos y todavía no cuenta con sincronización de inspecciones offline.
+En la Semana 3 se trabajó en el **Service Worker, la estrategia de caché y el funcionamiento offline de los recursos de la aplicación**. La captura offline y sincronización de inspecciones se incorporó posteriormente como parte de la Semana 5.
 
 ## Alcance de la Semana 5
 

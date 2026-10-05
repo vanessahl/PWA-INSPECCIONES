@@ -193,7 +193,7 @@
 
 ## Semana 5 - Angel Gabriel Guzman Miguel
 
-- **Commit SHA evaluado:** [].
+- **Commit SHA evaluado:** `f70a3a83765f252d5dfeed5dbc31952aae9411da`.
 - **Contribución:** Amplié `tests/sync.spec.ts` con casos del endpoint de sincronización para datos mal formados, solicitudes sin clave idempotente y conflictos de revisión. Las pruebas comprueban que los dos primeros casos devuelven HTTP 400 con un mensaje explicativo y que un conflicto devuelve HTTP 409 junto con la versión remota vigente.
 - **Decisión técnica:** Validé los límites del contrato HTTP en el endpoint, además de la cola local. Esto confirma que el servidor rechaza entradas antes de sincronizarlas y que quien llama recibe información suficiente para aplicar la política de resolución de conflictos.
 - **Pruebas ejecutadas y resultado:** Ejecuté `npm test`, `npm run build` y `npm run verify`. Las pruebas anteriores a sincronización pasaron (`starter`, `manifest`, `service-worker`, `offline` y `rendering`); este entorno bloqueó la ejecución de `tsx tests/sync.spec.ts` y el build al intentar crear procesos auxiliares (`spawn EPERM`). `npm run verify` finalizó con `Verificación de PWA: PASS`. Además, ejecuté el chequeo de tipos de `tests/sync.spec.ts` con TypeScript y terminó sin errores. Se debe repetir `npm test` y `npm run build` en una terminal local sin esa restricción antes de entregar.
@@ -203,7 +203,7 @@
 
 ## Semana 5 - Vanessa Hernandez Lopez
 
-* **Commit SHA evaluado:** [].
+* **Commit SHA evaluado:** `801a9f6a6638c30f4576bff0fe34eb644f532928`.
 * **Contribución:** Documenté en `docs/sync-policy.md` el comportamiento de persistencia y sincronización de las inspecciones. También realicé una prueba manual desde `/inspecciones`, guardando una inspección con conexión a internet y otra con el navegador en modo Offline.
 * **Decisión técnica:** Verifiqué el comportamiento real de la aplicación antes de documentarlo. Con conexión, la inspección quedó en estado **Sincronizada**. Al desactivar la conexión desde DevTools, una segunda inspección se guardó y apareció como **Pendiente de sincronizar**. Después de volver a activar la conexión, la inspección cambió automáticamente a **Sincronizada**. Esto permitió comprobar el flujo de guardado local y posterior sincronización.
 * **Pruebas ejecutadas y resultado:** Realicé la prueba manual en el navegador desde `http://localhost:3000/inspecciones`. La primera inspección se guardó correctamente con conexión. La segunda se guardó mientras el navegador estaba Offline y quedó como **Pendiente de sincronizar**. Al restaurar la conexión, pasó a **Sincronizada**. El resultado de la prueba fue satisfactorio.

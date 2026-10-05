@@ -4,7 +4,7 @@
 
 La capa de sincronización guarda inspecciones sintéticas en IndexedDB y mantiene una outbox durable. `enqueueInspection` valida el esquema y escribe el registro local y su operación pendiente en una misma transacción. El mismo ID no se inserta dos veces.
 
-La pantalla `/inspecciones` permite capturar datos sintéticos, guardarlos localmente y enviarlos al endpoint `POST /api/inspecciones/sync`. El endpoint de demostración implementa claves idempotentes y control de revisión, pero su almacén remoto vive en memoria del proceso; no es una base persistente ni un backend listo para producción. `registerOnlineSync` vuelve a procesar la cola cuando el navegador emite `online`.
+La pantalla `/inspecciones` permite capturar datos sintéticos, guardarlos localmente y enviarlos al endpoint `POST /api/inspecciones/sync`. El endpoint de demostración implementa claves idempotentes y control de revisión, pero su almacén remoto vive en memoria del proceso; no es una base persistente ni un backend listo para producción. `registerOnlineSync` procesa la cola cuando el navegador emite `online` y programa el siguiente intento al vencer el backoff o el lease mientras el navegador siga conectado. Si pierde conexión, suspende el temporizador y espera otro evento `online`.
 
 ## Recorrido manual
 
@@ -68,6 +68,7 @@ El registro local y la outbox se escriben juntos. La creación requiere un conte
 4. Un fallo, timeout o respuesta inválida devuelve la entrada a `pending` y conserva el error para diagnóstico.
 5. El backoff exponencial comienza en 1 segundo y llega hasta 60 segundos. Las ejecuciones se limitan a 50 operaciones.
 6. Una entrada `in-flight` con lease vencido puede reclamarse después de un cierre o interrupción de pestaña.
+7. El listener de sincronización programa automáticamente el siguiente intento pendiente cuando vence el backoff; no necesita un nuevo evento `online` si la conectividad ya estaba activa.
 
 La garantía local es que una inspección y su entrada se encolan una vez por ID, y que los reintentos conservan la clave idempotente. La prevención de duplicados remotos depende de que el servidor implemente y persista esa clave; un cliente no puede garantizarla si un servidor acepta una operación y pierde su respuesta sin soportar idempotencia.
 
@@ -103,10 +104,11 @@ npm run build
 npm run verify
 ```
 
-En Windows sin GNU Make, `npm run verify` es el equivalente exacto de `make verify` porque el target `verify` del Makefile ejecuta únicamente ese script. `tests/sync.spec.ts` comprueba duplicados, validación, reintentos, backoff, éxito, conflictos local/remoto y recuperación de leases expirados.
+En Windows sin GNU Make, `npm run verify` es el equivalente exacto de `make verify` porque el target `verify` del Makefile ejecuta únicamente ese script. `tests/sync.spec.ts` comprueba duplicados, validación, reintentos automáticos y backoff, éxito, conflictos local/remoto, respuesta HTTP, persistencia del adapter y recuperación de leases expirados.
 
 ## Fallos encontrados durante la integración
 
 - El primer build detectó que TypeScript infería como `unknown` el resultado de la transacción que encola; se resolvió declarando explícitamente el resultado booleano y el build posterior pasó.
 - El check público del kit invoca `rg`, que no está disponible en el Bash de este Windows. El equivalente ejecutado en PowerShell confirmó los artefactos; su escaneo amplio produjo falsos positivos por `js-tokens` en `package-lock.json` y menciones preventivas en documentos, no por valores sensibles.
 - `npm ci` reporta dos vulnerabilidades en el árbol de dependencias (una alta y una crítica). No se aplicó `npm audit fix --force` porque podría introducir cambios mayores no relacionados con esta entrega.
+- En esta revisión, `npm ci`, `npm test`, `npm run build` y `npm run verify` terminaron correctamente; la prueba de sincronización incluye reintento automático tras un fallo transitorio. No se pudo despachar un workflow de GitHub Actions desde este entorno, así que el resultado de CI debe confirmarse al publicar el commit.

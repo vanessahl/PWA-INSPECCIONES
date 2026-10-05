@@ -197,17 +197,52 @@ export function registerOnlineSync(
 ): () => void {
   if (typeof window === "undefined") return () => undefined;
   let running = false;
+  let disposed = false;
+  let retryTimer: ReturnType<typeof setTimeout> | undefined;
+  const clearRetryTimer = () => {
+    if (retryTimer !== undefined) {
+      clearTimeout(retryTimer);
+      retryTimer = undefined;
+    }
+  };
+
+  const scheduleRetry = async () => {
+    if (disposed || !navigator.onLine) return;
+    try {
+      const pending = await store.listPending();
+      if (disposed || pending.length === 0) return;
+      const nextAttemptAt = Math.min(...pending.map((entry) =>
+        entry.status === "in-flight" ? entry.leaseUntil : entry.nextAttemptAt
+      ));
+      clearRetryTimer();
+      retryTimer = setTimeout(run, Math.max(0, nextAttemptAt - (options.now ?? Date.now)()));
+    } catch (error) {
+      options.onError?.(error);
+    }
+  };
+
   const run = () => {
-    if (running) return;
+    if (running || disposed || !navigator.onLine) return;
+    clearRetryTimer();
     running = true;
     void syncPending(store, transport, options)
       .then((summary) => options.onComplete?.(summary))
       .catch((error: unknown) => options.onError?.(error))
-      .finally(() => { running = false; });
+      .finally(() => {
+        running = false;
+        void scheduleRetry();
+      });
   };
+  const handleOffline = () => clearRetryTimer();
   window.addEventListener("online", run);
-  if (typeof navigator === "undefined" || navigator.onLine) run();
-  return () => window.removeEventListener("online", run);
+  window.addEventListener("offline", handleOffline);
+  if (navigator.onLine) run();
+  return () => {
+    disposed = true;
+    clearRetryTimer();
+    window.removeEventListener("online", run);
+    window.removeEventListener("offline", handleOffline);
+  };
 }
 
 export function createSyncStore(): SyncStore {
