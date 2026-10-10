@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "../../../components/app-shell";
 import { inspections } from "../../../lib/data/inspections";
+import { LocalInspectionDetail } from "../../../components/local-inspection-detail";
 
 type InspectionDetailPageProps = {
   params: { id: string };
@@ -29,12 +30,9 @@ export default function InspectionDetailPage({ params }: InspectionDetailPagePro
             <Link className="text-link" href="/inspecciones">Volver al listado</Link>
           </article>
         ) : (
-          <section className="state-panel state-error" role="alert">
-            <span className="state-icon" aria-hidden="true">!</span>
-            <h1>Inspección no encontrada</h1>
-            <p>No existe un registro sintético con el identificador solicitado.</p>
-            <Link className="button-link" href="/inspecciones">Volver al listado</Link>
-          </section>
+          <div aria-label="Inspección no encontrada" role="alert">
+            <LocalInspectionDetail id={params.id} />
+          </div>
         )}
       </main>
     </AppShell>

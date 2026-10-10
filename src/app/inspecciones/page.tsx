@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { AppShell } from "../../components/app-shell";
 import { LoadingState } from "../../components/loading-state";
 import { inspections, type Inspection } from "../../lib/data/inspections";
@@ -13,6 +13,14 @@ import {
   syncPending
 } from "../../lib/sync/queue";
 import type { StoredInspection } from "../../lib/storage/schema";
+import { getCurrentLocation, type SyntheticLocation } from "../../lib/device/geolocation";
+import { notifyInspectionChange } from "../../lib/notifications/client";
+import {
+  cameraFailureReason,
+  requestCameraStream,
+  stopCameraStream,
+  validateEvidenceFile
+} from "../../lib/device/camera";
 
 type ListState =
   | { status: "loading" }
@@ -26,6 +34,11 @@ export default function InspectionsPage() {
   const [syncNotice, setSyncNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const [online, setOnline] = useState(false);
+  const [evidenceName, setEvidenceName] = useState("");
+  const [locationCapture, setLocationCapture] = useState<SyntheticLocation | null>(null);
+  const [capabilityNotice, setCapabilityNotice] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState({
     location: "",
     date: "",
@@ -98,8 +111,10 @@ export default function InspectionsPage() {
     setSaving(true);
     setSyncNotice("");
 
+    const localId = globalThis.crypto?.randomUUID?.()
+      ?? `local-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     const record: Inspection = {
-      id: `local-${crypto.randomUUID()}`,
+      id: `local-${localId}`,
       ...draft,
       findings: Number(draft.findings),
       statusLabel: draft.status === "attention" ? "Requiere atención" : "Sin incidencias"
@@ -111,13 +126,21 @@ export default function InspectionsPage() {
       if (!added) throw new Error("La inspección ya existe en el almacenamiento local.");
       setLocalRecords(await store.listLocal());
       setDraft({ ...draft, location: "", date: "", findings: "0", summary: "" });
+      setEvidenceName("");
+      setLocationCapture(null);
 
       if (navigator.onLine) {
         const summary = await syncPending(store, createHttpSyncTransport());
         setLocalRecords(await store.listLocal());
-        setSyncNotice(summary.synced
+        const message = summary.synced
           ? "Inspección guardada y sincronizada."
-          : "Inspección guardada localmente; se reintentará cuando haya conexión.");
+          : "Inspección guardada localmente; se reintentará cuando haya conexión.";
+        setSyncNotice(message);
+        if (summary.synced) {
+          await notifyInspectionChange("Inspección sincronizada", { body: "El registro sintético se sincronizó correctamente." }, () => {
+            setSyncNotice(`${message} Aviso mostrado dentro de la aplicación.`);
+          });
+        }
       } else {
         setSyncNotice("Inspección guardada en este dispositivo; pendiente de conexión.");
       }
@@ -125,6 +148,79 @@ export default function InspectionsPage() {
       setSyncNotice("No se pudo guardar la inspección en este dispositivo. Revisa los datos e inténtalo de nuevo.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleEvidenceChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const evidence = validateEvidenceFile(file);
+    if (!evidence) {
+      setEvidenceName("");
+      setCapabilityNotice("La evidencia debe ser una imagen JPEG, PNG o WebP de máximo 5 MiB.");
+      event.target.value = "";
+      return;
+    }
+    setEvidenceName(evidence.name);
+    setCapabilityNotice("Evidencia sintética adjunta de forma opcional.");
+  };
+
+  const handleLocationRequest = async () => {
+    setCapabilityNotice("Solicitando ubicación opcional…");
+    const result = await getCurrentLocation();
+    if (result.ok) {
+      setLocationCapture(result.location);
+      setCapabilityNotice("Ubicación opcional capturada con precisión limitada.");
+    } else {
+      setLocationCapture(null);
+      const message = result.reason === "insecure-context"
+        ? "La ubicación requiere HTTPS cuando se accede desde la IP del celular."
+        : result.reason === "permission-denied"
+          ? "Se rechazó el permiso de ubicación; puedes guardar la inspección sin ella."
+          : "No se capturó ubicación; puedes guardar la inspección sin ella.";
+      setCapabilityNotice(message);
+    }
+  };
+
+  const handleCameraRequest = async () => {
+    setCapabilityNotice("Solicitando permiso para usar la cámara…");
+    try {
+      const stream = await requestCameraStream();
+      if (!stream) {
+        setCapabilityNotice("No se concedió el permiso de cámara; puedes seleccionar un archivo.");
+        return;
+      }
+      stopCameraStream(stream);
+      setCapabilityNotice("Permiso de cámara concedido. Selecciona o toma la fotografía.");
+      cameraInputRef.current?.click();
+    } catch (error) {
+      const reason = cameraFailureReason(error);
+      setCapabilityNotice(
+        reason === "permission-denied"
+          ? "Se rechazó el permiso de cámara; puedes seleccionar un archivo."
+          : "La cámara no está disponible; puedes seleccionar un archivo."
+      );
+    }
+  };
+
+  const handleFileRequest = async () => {
+    setCapabilityNotice("Solicitando permiso antes de seleccionar la evidencia…");
+    try {
+      const stream = await requestCameraStream();
+      if (!stream) {
+        setCapabilityNotice("No se concedió el permiso; no se abrió el selector de evidencia.");
+        return;
+      }
+      stopCameraStream(stream);
+      setCapabilityNotice("Permiso concedido. Ahora selecciona una imagen.");
+      fileInputRef.current?.click();
+    } catch (error) {
+      const reason = cameraFailureReason(error);
+      setCapabilityNotice(
+        reason === "permission-denied"
+          ? "Se rechazó el permiso; no se abrió el selector de evidencia."
+          : "No fue posible solicitar el permiso; inténtalo nuevamente."
+      );
     }
   };
 
@@ -194,10 +290,36 @@ export default function InspectionsPage() {
               <textarea required maxLength={500} rows={3} value={draft.summary}
                 onChange={(event) => setDraft({ ...draft, summary: event.target.value })} />
             </label>
+            <div className="capability-actions">
+              <span className="capability-label">Evidencia opcional</span>
+              <div className="capability-buttons">
+                <button className="button-link button-secondary" type="button"
+                  onClick={() => void handleFileRequest()}>
+                  Seleccionar archivo
+                </button>
+                <button className="button-link button-secondary" type="button"
+                  onClick={() => void handleCameraRequest()}>
+                  Tomar foto
+                </button>
+              </div>
+              <input ref={fileInputRef} accept="image/jpeg,image/png,image/webp" className="visually-hidden"
+                type="file" onChange={handleEvidenceChange} />
+              <input ref={cameraInputRef} accept="image/jpeg,image/png,image/webp" capture="environment"
+                className="visually-hidden" type="file" onChange={handleEvidenceChange} />
+            </div>
+            <div className="capability-actions">
+              <span className="capability-label">Ubicación opcional</span>
+              <button className="button-link button-secondary" type="button" onClick={() => void handleLocationRequest()}>
+                {locationCapture ? "Actualizar ubicación" : "Usar ubicación"}
+              </button>
+            </div>
             <button className="button-link" disabled={saving} type="submit">
               {saving ? "Guardando…" : "Guardar inspección"}
             </button>
           </form>
+          {evidenceName && <p className="capability-note">Evidencia seleccionada: {evidenceName}</p>}
+          {locationCapture && <p className="capability-note">Ubicación sintética capturada: precisión aproximada de {Math.round(locationCapture.accuracy)} m.</p>}
+          {capabilityNotice && <p className="sync-notice" aria-live="polite">{capabilityNotice}</p>}
           {syncNotice && <p className="sync-notice" aria-live="polite">{syncNotice}</p>}
         </section>
 
@@ -243,13 +365,9 @@ export default function InspectionsPage() {
                     <div><dt>Responsable</dt><dd>{inspection.inspector}</dd></div>
                     <div><dt>Hallazgos</dt><dd>{inspection.findings}</dd></div>
                   </dl>
-                  {localRecord ? (
-                    <span className="muted">Registro guardado en este dispositivo</span>
-                  ) : (
-                    <Link className="text-link" href={`/inspecciones/${inspection.id}`}>
-                      Ver detalle
-                    </Link>
-                  )}
+                  <Link className="text-link" href={`/inspecciones/${inspection.id}`}>
+                    Ver detalle
+                  </Link>
                 </article>
                 );
               })}

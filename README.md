@@ -8,6 +8,8 @@ Durante la Semana 4 se comparan dos rutas de renderizado: el listado `/inspeccio
 
 Durante la Semana 5 se agregó una outbox durable en IndexedDB, reintentos idempotentes y una política de resolución de conflictos. Las decisiones y límites se explican en `docs/sync-policy.md`.
 
+Durante la Semana 6 se agregaron capacidades opcionales de cámara, geolocalización y notificaciones con permisos mínimos, fallback y datos sintéticos. Las decisiones y límites se explican en `docs/capabilities.md`.
+
 ## Requisitos
 
 * Node.js 20 o superior
@@ -102,7 +104,11 @@ También se puede revisar el comportamiento offline desde las herramientas de de
 La prueba de renderizado se ejecuta dentro de `npm test` y valida que el listado sea CSR, que el detalle sea SSR y que existan los estados de carga y error.
 Las pruebas de renderizado y sincronización forman parte de `npm test`; cubren el formulario, IndexedDB simulado, endpoint, duplicados, reintentos, conflictos y recuperación tras expirar un lease. Para la comprobación manual offline, desactiva la red desde DevTools, guarda otra inspección en `/inspecciones` y restablece la conexión para verla sincronizada.
 
+La prueba de capacidades forma parte de `npm test` y cubre la ausencia de APIs del navegador, el rechazo de permisos, la validación de evidencia de imagen y el fallback de notificaciones. Las APIs de cámara, geolocalización y notificaciones solo se solicitan desde una acción explícita del usuario.
+
 En esta revisión se ejecutaron `npm ci`, `npm test`, `npm run build` y `npm run verify`; todos terminaron correctamente. `npm ci` informó dos vulnerabilidades en dependencias (una alta y una crítica). Este entorno no tiene GNU Make ni GitHub CLI, y no fue posible despachar un workflow de Actions desde las herramientas disponibles; por eso el estado de Actions debe verificarse en GitHub cuando se publique el commit. `npm run verify` es el equivalente local exacto de `make verify`.
+
+Para la Semana 6, GitHub Actions usa `.github/workflows/week-06-w06-device-push.yml`. El flujo instala con `npm ci --ignore-scripts --no-audit --no-fund`, ejecuta el build y valida los artefactos obligatorios. En Windows sin GNU Make, `npm run verify` sigue siendo el equivalente exacto de `make verify`.
 
 ## Evidencia
 
@@ -125,3 +131,7 @@ En la Semana 3 se trabajó en el **Service Worker, la estrategia de caché y el 
 ## Alcance de la Semana 5
 
 Se implementaron el formulario de captura, el esquema IndexedDB, la outbox y un endpoint de demostración para probar sincronización, deduplicación y conflictos con datos sintéticos. El estado remoto es volátil y no reemplaza una API con base de datos persistente. El recorrido manual se describe en `docs/sync-policy.md`.
+
+## Alcance de la Semana 6
+
+Se añadieron adaptadores opcionales para cámara, geolocalización y notificaciones. No se solicitan permisos durante la carga inicial, no se almacenan datos personales y cada capacidad conserva un flujo útil cuando el navegador no la soporta o el usuario la rechaza.

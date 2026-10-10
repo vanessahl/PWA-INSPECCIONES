@@ -1,0 +1,36 @@
+name: Academic Evaluation Feedback - Week 6
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+      - name: Verify
+        run: npm run verify
+      - name: Upload evaluation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: academic-evidence-w06-device-push
+          if-no-files-found: ignore
+          path: |
+            reports/verification.json
+            evaluation-result.json
+            coverage/
+            test-results/

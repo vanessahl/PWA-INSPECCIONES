@@ -33,6 +33,11 @@ const required = [
   "src/lib/storage/schema.ts",
   "src/lib/sync/queue.ts",
   "src/lib/sync/conflict-policy.ts",
+  "src/lib/device/camera.ts",
+  "src/lib/device/geolocation.ts",
+  "src/lib/notifications/client.ts",
+  "docs/capabilities.md",
+  "tests/capabilities.spec.ts",
   "evidence/individual.md"
 ];
 
@@ -70,6 +75,18 @@ const inspectionPage = existsSync(resolve(root, "src/app/inspecciones/page.tsx")
 const syncEndpoint = existsSync(resolve(root, "src/app/api/inspecciones/sync/route.ts"))
   ? readFileSync(resolve(root, "src/app/api/inspecciones/sync/route.ts"), "utf8")
   : "";
+const camera = existsSync(resolve(root, "src/lib/device/camera.ts"))
+  ? readFileSync(resolve(root, "src/lib/device/camera.ts"), "utf8")
+  : "";
+const geolocation = existsSync(resolve(root, "src/lib/device/geolocation.ts"))
+  ? readFileSync(resolve(root, "src/lib/device/geolocation.ts"), "utf8")
+  : "";
+const notifications = existsSync(resolve(root, "src/lib/notifications/client.ts"))
+  ? readFileSync(resolve(root, "src/lib/notifications/client.ts"), "utf8")
+  : "";
+const capabilitiesTests = existsSync(resolve(root, "tests/capabilities.spec.ts"))
+  ? readFileSync(resolve(root, "tests/capabilities.spec.ts"), "utf8")
+  : "";
 
 const checks = {
   serviceWorkerEvents: ["install", "activate", "fetch"].every((event) =>
@@ -93,7 +110,13 @@ const checks = {
     ),
   offlineCaptureForm: /handleSubmit/.test(inspectionPage) && /enqueueInspection/.test(inspectionPage),
   httpSyncEndpoint: /createHttpSyncTransport/.test(inspectionPage) &&
-    /idempotency-key/.test(syncEndpoint) && /status: 409/.test(syncEndpoint)
+    /idempotency-key/.test(syncEndpoint) && /status: 409/.test(syncEndpoint),
+  cameraCapability: /getUserMedia/.test(camera) && /validateEvidenceFile/.test(camera),
+  geolocationCapability: /getCurrentPosition/.test(geolocation) && /permission-denied/.test(geolocation),
+  notificationFallback: /requestNotificationPermission/.test(notifications) &&
+    /mode: "fallback"/.test(notifications),
+  capabilityTestsRegistered: /capabilities\.spec\.ts/.test(packageJson) &&
+    /fallback/.test(capabilitiesTests)
 };
 const failedChecks = Object.entries(checks)
   .filter(([, passed]) => !passed)
@@ -123,4 +146,3 @@ if (missing.length > 0 || failedChecks.length > 0) {
 
 console.log("Verificación de PWA: PASS");
 console.log(`Reporte: ${report}`);
-
