@@ -212,7 +212,7 @@
 
 ## Semana 6 - Jessica Juarez Rodriguez
 
-- **Commit SHA evaluado:** `pendiente de fijar al entregar; obtener con git rev-parse HEAD`.
+- **Commit SHA evaluado:** `5b5261e5d9c28559d3c4cfc737567387505c07d7`.
 - **Contribución:** Implementé los adaptadores opcionales de cámara, geolocalización y notificaciones en `src/lib/device` y `src/lib/notifications`, los conecté a la pantalla `/inspecciones`, y agregué las pruebas deterministas y la documentación de capacidades.
 - **Decisión técnica:** Los permisos solo se solicitan cuando una acción explícita del usuario invoca la capacidad. La evidencia acepta únicamente imágenes sintéticas de hasta 5 MiB; la geolocalización usa baja precisión y conserva solo coordenadas, precisión y hora; las notificaciones tienen fallback cuando la API no existe, se rechaza el permiso o falla la creación.
 - **Prueba ejecutada y resultado:** Ejecuté `npm ci`, `npm test`, `npm run build` y `npm run verify`. La prueba `tests/capabilities.spec.ts` comprueba ausencia de APIs, validación de archivos, ubicación sintética y fallback de notificaciones. También verifiqué que `/inspecciones` compile con los controles opcionales de evidencia, ubicación y aviso de sincronización. En Windows, `npm run verify` es el equivalente exacto documentado de `make verify`.
