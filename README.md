@@ -135,3 +135,104 @@ Se implementaron el formulario de captura, el esquema IndexedDB, la outbox y un 
 ## Alcance de la Semana 6
 
 Se añadieron adaptadores opcionales para cámara, geolocalización y notificaciones. No se solicitan permisos durante la carga inicial, no se almacenan datos personales y cada capacidad conserva un flujo útil cuando el navegador no la soporta o el usuario la rechaza.
+
+## Prueba manual de permisos
+
+### Objetivo
+
+Comprobar que la pantalla de inspecciones maneja correctamente los permisos de la cámara y la ubicación, que ofrece alternativas cuando se rechazan y que permite consultar el detalle de una inspección guardada.
+
+Las pruebas deben realizarse con datos sintéticos y sin utilizar información personal real.
+
+### Preparación
+
+1. Instalar las dependencias del proyecto con `npm ci`.
+2. Iniciar la aplicación con `npm run dev`.
+3. Abrir en el navegador la dirección local que muestra la terminal.
+4. Entrar a la pantalla `/inspecciones`.
+5. Utilizar datos ficticios para completar los campos obligatorios de una inspección.
+
+### Prueba 1. Tomar foto y permitir el acceso
+
+**Pasos:**
+
+1. Abrir la pantalla de inspecciones.
+2. Presionar **Tomar foto**.
+3. Cuando el navegador solicite permiso para utilizar la cámara, presionar **Permitir**.
+4. Si el dispositivo muestra la cámara, realizar una captura de prueba.
+5. Confirmar la captura y revisar la pantalla.
+
+**Resultado esperado:**
+
+El navegador solicita permiso para acceder a la cámara. Al presionar Permitir, la aplicación intenta abrir el selector configurado para capturar una fotografía. Si se selecciona una imagen válida, se muestra su nombre en la pantalla. Si el dispositivo no permite acceder a la cámara, se muestra un mensaje informativo.
+
+### Prueba 2. Tomar foto y bloquear el acceso
+
+**Pasos:**
+
+1. Restablecer o cambiar el permiso de la cámara en la configuración del sitio del navegador.
+2. Regresar a la pantalla `/inspecciones`.
+3. Presionar **Tomar foto**.
+4. Cuando aparezca la solicitud de permiso, presionar **Bloquear**.
+5. Revisar el mensaje que muestra la aplicación y las alternativas disponibles.
+
+**Resultado esperado:**
+
+La aplicación muestra un mensaje indicando que el permiso de cámara fue rechazado y que se puede seleccionar un archivo. Sin embargo, en la implementación actual, el botón Seleccionar archivo también solicita permiso de cámara, por lo que no abre el selector si ese permiso permanece bloqueado. Este comportamiento debe registrarse como una limitación detectada.
+
+### Prueba 3. Usar ubicación y permitir el acceso
+
+**Pasos:**
+
+1. Restablecer el permiso de ubicación del sitio si ya se había bloqueado.
+2. Regresar a la pantalla de inspecciones.
+3. Presionar **Usar ubicación**.
+4. Cuando el navegador solicite permiso, presionar **Permitir**.
+5. Esperar a que el navegador intente obtener la ubicación.
+6. Revisar el resultado mostrado en la pantalla.
+
+**Resultado esperado:**
+
+Si el navegador y el dispositivo permiten obtener la ubicación, la aplicación debe recibir las coordenadas y utilizarlas según el funcionamiento de la pantalla. Si la ubicación no se obtiene, debe mostrarse o manejarse el error sin provocar que la aplicación deje de funcionar.
+
+### Prueba 4. Usar ubicación y bloquear el acceso
+
+**Pasos:**
+
+1. Restablecer el permiso de ubicación del sitio si es necesario.
+2. Abrir nuevamente la pantalla de inspecciones.
+3. Presionar **Usar ubicación**.
+4. Cuando aparezca la solicitud de permiso, presionar **Bloquear**.
+5. Revisar el mensaje mostrado y comprobar si se puede continuar sin ubicación.
+
+**Resultado esperado:**
+
+La aplicación no debe obtener las coordenadas cuando el permiso está bloqueado. Debe manejar el rechazo correctamente y permitir continuar sin ubicación si los demás campos obligatorios están completos.
+
+### Prueba 5. Guardar una inspección sin fotografía ni ubicación
+
+**Pasos:**
+
+1. Abrir la pantalla `/inspecciones`.
+2. Completar los campos obligatorios con información ficticia.
+3. No seleccionar ningún archivo ni tomar una fotografía.
+4. No presionar **Usar ubicación**.
+5. Presionar el botón para guardar la inspección.
+6. Revisar el resultado en la pantalla.
+
+**Resultado esperado:**
+
+La inspección debe guardarse correctamente si se completaron todos los campos obligatorios. La falta de fotografía o ubicación no debe impedir el registro cuando estos recursos son opcionales.
+
+### Prueba 6. Presionar Ver detalle después de guardar
+
+**Pasos:**
+
+1. Guardar una inspección de prueba.
+2. Localizar la inspección recién guardada en la lista.
+3. Presionar **Ver detalle**.
+4. Revisar la información que aparece en la pantalla de detalle.
+
+**Resultado esperado:**
+
+La aplicación debe abrir el detalle correspondiente a la inspección seleccionada y mostrar la información guardada. Los datos deben corresponder al registro seleccionado y no a otra inspección.

@@ -29,3 +29,73 @@ En `/inspecciones`, el botón **Usar ubicación** activa la solicitud únicament
 Cuando una inspección se sincroniza después de pulsar **Guardar inspección**, la interfaz intenta mostrar una notificación de cambio. Si el permiso se deniega o la API no existe, muestra el aviso dentro de la aplicación.
 
 El endpoint de demostración de semanas anteriores continúa siendo sintético y volátil. Esta semana no se almacenan coordenadas ni se agregan credenciales, tokens o suscripciones push.
+
+## Capacidades de la aplicación de inspecciones
+
+## 1. Seleccionar archivo
+
+El botón **Seleccionar archivo** permite elegir una imagen para utilizarla como evidencia de una inspección. Antes de abrir el selector, la aplicación solicita permiso para acceder a la cámara mediante el navegador. Si el permiso se concede, se abre el selector de archivos para elegir una imagen JPEG, PNG o WebP.
+
+La imagen seleccionada debe tener un tamaño máximo de 5 MiB. Si el archivo no cumple con el formato o tamaño permitido, la aplicación muestra un mensaje de error y no acepta la imagen. Cuando la selección es válida, se muestra el nombre del archivo en la pantalla.
+
+Si se rechaza el permiso de cámara, el selector no se abre en la implementación actual.
+
+## 2. Tomar foto
+
+El botón **Tomar foto** solicita permiso para utilizar la cámara del dispositivo. Si se concede el permiso, la aplicación detiene la transmisión de la cámara y abre el selector de imágenes configurado para utilizar la cámara trasera cuando el dispositivo lo permite.
+
+El usuario puede intentar capturar una fotografía y seleccionar una imagen válida. Si el permiso se rechaza o la cámara no está disponible, se muestra un mensaje que indica que puede seleccionarse un archivo, aunque esta alternativa también solicita el permiso de cámara en la implementación actual.
+
+La pantalla muestra el nombre de la evidencia seleccionada. En el código revisado, la imagen no se incorpora al registro guardado como un archivo persistente.
+
+## 3. Usar ubicación
+
+El botón **Usar ubicación** solicita la ubicación del dispositivo mediante la función de geolocalización. Si la operación tiene éxito, la pantalla muestra un mensaje que indica que se capturó una ubicación opcional con precisión limitada y presenta la precisión aproximada en metros.
+
+Si se rechaza el permiso, no se obtiene la ubicación o existe un problema con el contexto de seguridad, la aplicación muestra un mensaje explicativo. El usuario puede continuar con la inspección sin ubicación.
+
+La captura de ubicación se mantiene en el estado de la pantalla, pero en el código revisado no se agrega al registro que se guarda.
+
+## 4. ¿Qué sucede al presionar Permitir?
+
+Cuando el usuario presiona **Permitir**, autoriza al navegador a intentar utilizar el recurso solicitado.
+
+- **Cámara:** la aplicación intenta obtener acceso a la cámara y, si lo consigue, abre el selector configurado para capturar una fotografía.
+- **Ubicación:** la aplicación intenta obtener las coordenadas del dispositivo. Si la operación tiene éxito, muestra un mensaje de confirmación y la precisión aproximada.
+
+El permiso no garantiza por sí solo que la operación termine correctamente, ya que también depende del dispositivo, del navegador y de la disponibilidad del recurso.
+
+## 5. ¿Qué sucede al presionar Bloquear?
+
+Cuando el usuario presiona **Bloquear**, el navegador rechaza el acceso al recurso solicitado.
+
+- **Cámara:** la aplicación muestra un mensaje indicando que no se concedió el permiso o que se rechazó el acceso. No se abre el selector de evidencia.
+- **Ubicación:** la aplicación muestra un mensaje que indica que se rechazó el permiso y que la inspección puede guardarse sin ubicación.
+
+La aplicación maneja estos casos mediante mensajes en pantalla para informar al usuario sobre el resultado.
+
+## 6. Alternativas cuando se rechaza un permiso
+
+Cuando se rechaza el permiso de ubicación, el usuario puede guardar la inspección sin coordenadas, siempre que complete los campos obligatorios.
+
+Cuando se rechaza el permiso de cámara, la aplicación informa que puede seleccionarse un archivo. Sin embargo, en la implementación revisada, el botón **Seleccionar archivo** también solicita el permiso de cámara. Por este motivo, si el permiso permanece bloqueado, no se puede abrir el selector mediante ese botón.
+
+## 7. Cámara y ubicación opcionales
+
+La fotografía y la ubicación se presentan como funciones opcionales de la pantalla. Los campos obligatorios para guardar una inspección son laboratorio, fecha, hallazgos y resumen.
+
+El usuario puede registrar una inspección sin solicitar la ubicación y sin seleccionar una fotografía. La aplicación intenta guardar el registro en el almacenamiento local y, si hay conexión, intenta sincronizarlo con el servicio de demostración.
+
+Aunque la pantalla permite seleccionar una imagen y capturar una ubicación, el código revisado no incorpora esos datos al objeto de inspección que se guarda.
+
+## 8. Uso de datos sintéticos en las pruebas
+
+La aplicación utiliza registros sintéticos de mantenimiento de laboratorios y opciones ficticias para el responsable de la inspección. Las pruebas manuales deben utilizar información de ejemplo, sin incluir datos personales reales.
+
+Los datos sintéticos permiten comprobar el comportamiento de la pantalla, los mensajes de permisos, el registro local y la navegación al detalle.
+
+## 9. Requisito HTTPS para la ubicación
+
+La geolocalización del navegador puede requerir un contexto seguro, normalmente HTTPS. En desarrollo local, los navegadores suelen permitir esta función desde `localhost`; sin embargo, el acceso desde la dirección IP de un celular puede requerir HTTPS.
+
+Si la ubicación no funciona, se debe revisar la dirección utilizada, los permisos del navegador y la disponibilidad de los servicios de ubicación. La aplicación muestra un mensaje específico cuando detecta el problema de contexto inseguro al acceder desde la IP del celular.
