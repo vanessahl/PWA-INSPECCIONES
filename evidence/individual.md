@@ -227,3 +227,13 @@
 - **Pruebas ejecutadas y resultado:** Ejecuté `npm test`, `npm run build`, `npm run verify` y `git diff --check`. Todos los comandos finalizaron correctamente: la prueba `capabilities.spec.ts` pasó, la compilación de producción terminó sin errores, la verificación mostró `Verificación de PWA: PASS` y la revisión de formato no reportó espacios ni errores.
 - **Limitación:** Las pruebas automatizadas simulan APIs y permisos; la cámara, ubicación y notificaciones reales dependen de un navegador compatible, HTTPS y la decisión de la persona usuaria. No se usaron fotografías reales, ubicaciones personales ni información privada.
 - **Uso de IA:** Utilicé Codex/ChatGPT de OpenAI para identificar casos límite, estructurar las aserciones y redactar la evidencia. Revisé el código y las pruebas, y validé personalmente los resultados de los comandos indicados.
+
+
+## Semana 6 - Vanessa Hernández López
+
+- **Commit SHA evaluado:** `4f75359abd1b9aef7b5c4c3f4577965628a8c358` 
+- **Contribución:** Revisé y documenté las capacidades del proyecto PWA-INSPECCIONES en `docs/capabilities.md`, consulté el `README.md` y revisé la pantalla `src/app/inspecciones/page.tsx` para comprender el funcionamiento de las inspecciones. También preparé el registro de resultados de mis pruebas manuales en `evidence/individual.md`.
+- **Decisión técnica:** Para documentar correctamente el funcionamiento de la aplicación, es necesario comprobar cada capacidad y registrar los resultados observados. Las pruebas consideran el uso de la cámara y la ubicación con permiso permitido y bloqueado, el guardado de una inspección sin fotografía ni ubicación y la consulta del detalle de una inspección. Los resultados deben corresponder al comportamiento real del sistema.
+- **Prueba ejecutada y resultado:** Revisé la documentación y preparé los casos de prueba manual para la pantalla de inspecciones. Realicé las pruebas manuales correspondientes a las funcionalidades de la aplicación y comprobé que funcionaran correctamente. Los resultados obtenidos fueron satisfactorios y coincidieron con lo esperado.
+- **Limitación:** Las pruebas de cámara y geolocalización dependen de que las funciones estén implementadas, de la compatibilidad del navegador y de los permisos concedidos por el usuario. 
+- **Uso de IA:** Utilicé ChatGPT como apoyo para organizar la documentación, comprender los casos de prueba manual y redactar el registro de resultados.
