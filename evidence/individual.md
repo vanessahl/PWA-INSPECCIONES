@@ -221,7 +221,7 @@
 
 ## Semana 6 - Angel Gabriel Guzman Miguel
 
-- **Commit SHA evaluado:** []
+- **Commit SHA evaluado:** `6b58a46a01639ee7734ba2d31b8c865433a669ea`
 - **Contribución:** Amplié `tests/capabilities.spec.ts` para cubrir escenarios de cámara, geolocalización y notificaciones usando exclusivamente datos sintéticos. Las pruebas validan API de cámara ausente, permiso de cámara rechazado, archivo con tipo no permitido, archivo de más de 5 MiB, ubicación ausente, permiso de ubicación rechazado, notificaciones no disponibles y notificaciones rechazadas con fallback local. También comprueban que una inspección sintética se puede guardar sin fotografía ni ubicación.
 - **Decisión técnica:** Las capacidades del dispositivo son opcionales y se manejan con degradación controlada. Si una API no está disponible o la persona rechaza un permiso, la aplicación conserva el flujo principal de captura y muestra una alternativa dentro de la interfaz, sin bloquear el guardado de la inspección.
 - **Pruebas ejecutadas y resultado:** Ejecuté `npm test`, `npm run build`, `npm run verify` y `git diff --check`. Todos los comandos finalizaron correctamente: la prueba `capabilities.spec.ts` pasó, la compilación de producción terminó sin errores, la verificación mostró `Verificación de PWA: PASS` y la revisión de formato no reportó espacios ni errores.
