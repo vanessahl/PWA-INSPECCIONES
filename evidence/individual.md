@@ -242,7 +242,7 @@
 
 - ## Semana 8 - Jessica Juarez Rodriguez
 
-- **Commit SHA evaluado:** https://github.com/vanessahl/PWA-INSPECCIONES.git, rama `semana-08-jessica`, commit 5ec66bdf49f85abee84cff13968a7261aeebb720
+- **Commit SHA evaluado:** `9e6f5bbef832370bc1802c56eecdbe313fa189be`
 
 - **Contribución:** Hice las pruebas unitarias (`tests/unit/`), de integración (`tests/integration/`) y E2E (`tests/e2e/`) para comprobar que las inspecciones se guarden sin internet y se sincronicen después. También agregué el workflow `.github/workflows/academic-evaluation.yml` y actualicé la documentación y el README.
 
