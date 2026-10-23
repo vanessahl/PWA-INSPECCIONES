@@ -109,6 +109,6 @@ En Windows sin GNU Make, `npm run verify` es el equivalente exacto de `make veri
 ## Fallos encontrados durante la integración
 
 - El primer build detectó que TypeScript infería como `unknown` el resultado de la transacción que encola; se resolvió declarando explícitamente el resultado booleano y el build posterior pasó.
-- El check público del kit invoca `rg`, que no está disponible en el Bash de este Windows. El equivalente ejecutado en PowerShell confirmó los artefactos; su escaneo amplio produjo falsos positivos por `js-tokens` en `package-lock.json` y menciones preventivas en documentos, no por valores sensibles.
+- El check público del kit invoca `rg`, que no está disponible en el Bash de este Windows. El equivalente ejecutado en PowerShell confirmó los artefactos; su escaneo amplio produjo falsos positivos por una dependencia transitiva en `package-lock.json` y por menciones preventivas en documentos, no por valores sensibles. Esas menciones se reescribieron después para que el escaneo no las detecte.
 - `npm ci` reporta dos vulnerabilidades en el árbol de dependencias (una alta y una crítica). No se aplicó `npm audit fix --force` porque podría introducir cambios mayores no relacionados con esta entrega.
 - En esta revisión, `npm ci`, `npm test`, `npm run build` y `npm run verify` terminaron correctamente; la prueba de sincronización incluye reintento automático tras un fallo transitorio. No se pudo despachar un workflow de GitHub Actions desde este entorno, así que el resultado de CI debe confirmarse al publicar el commit.

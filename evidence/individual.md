@@ -237,3 +237,19 @@
 - **Prueba ejecutada y resultado:** Revisé la documentación y preparé los casos de prueba manual para la pantalla de inspecciones. Realicé las pruebas manuales correspondientes a las funcionalidades de la aplicación y comprobé que funcionaran correctamente. Los resultados obtenidos fueron satisfactorios y coincidieron con lo esperado.
 - **Limitación:** Las pruebas de cámara y geolocalización dependen de que las funciones estén implementadas, de la compatibilidad del navegador y de los permisos concedidos por el usuario. 
 - **Uso de IA:** Utilicé ChatGPT como apoyo para organizar la documentación, comprender los casos de prueba manual y redactar el registro de resultados.
+
+
+
+- ## Semana 8 - Jessica Juarez Rodriguez
+
+- **Commit SHA evaluado:** https://github.com/vanessahl/PWA-INSPECCIONES.git, rama `semana-08-jessica`, commit 5ec66bdf49f85abee84cff13968a7261aeebb720
+
+- **Contribución:** Hice las pruebas unitarias (`tests/unit/`), de integración (`tests/integration/`) y E2E (`tests/e2e/`) para comprobar que las inspecciones se guarden sin internet y se sincronicen después. También agregué el workflow `.github/workflows/academic-evaluation.yml` y actualicé la documentación y el README.
+
+- **Decisión técnica:** Usé `node:test` y `tsx` para hacer las pruebas sin instalar más dependencias. En las pruebas E2E inicié el servidor y revisé su respuesta por HTTP. Elegí esta opción porque es más rápida para ejecutar las pruebas automáticamente. También usé un reloj controlado para probar los reintentos sin tener que esperar.
+
+- **Prueba ejecutada y resultado:** Ejecuté `npm ci`, `npm run build`, `npm test`, `npm run test:unit` (14 pruebas OK), `npm run test:integration` (10 OK), `npm run test:e2e` (4 OK) y `npm run verify` (PASS). En Windows, `npm run verify` es el comando para comprobar que todo funcione correctamente.
+
+- **Limitación:** Las pruebas no revisan la interfaz en un navegador real y se usa una versión simulada de IndexedDB. Además, la idempotencia del servidor se pierde al reiniciarlo y algunos datos de prueba dependen de los registros preparados. También tuve un problema con los saltos de línea al actualizar la lista de archivos, pero lo detecté y lo corregí. GitHub Actions debe revisarse después de subir los cambios.
+
+- **Uso de IA:** Utilicé Claude.IA para ayudarme a preparar las pruebas, el workflow y la documentación. Después revisé el código y ejecuté los comandos para comprobar que las pruebas funcionaran correctamente.

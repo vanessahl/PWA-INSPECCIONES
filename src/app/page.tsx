@@ -286,7 +286,7 @@ export default function HomePage({ searchParams }: PageProps) {
 
   return (
     <AppShell>
-      <main className="page-shell">
+      <main className="page-shell" id="contenido">
         <header
           className="hero"
           style={{

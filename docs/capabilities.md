@@ -8,7 +8,7 @@ La Semana 6 agrega capacidades opcionales para inspecciones sintéticas. El fluj
 
 La aplicación no envía ni conserva una fotografía automáticamente. El consumidor decide si adjunta el archivo a una inspección y debe liberar la transmisión con `stopCameraStream`. Si el permiso es rechazado o la cámara no está disponible, el fallback es continuar sin evidencia.
 
-En `/inspecciones`, **Seleccionar archivo** solicita primero el permiso de cámara para mantener una confirmación explícita antes de adjuntar evidencia y después abre el selector normal. **Tomar foto** solicita la cámara del dispositivo mediante `capture="environment"`. La interfaz valida el archivo y confirma su selección sin convertirlo en un requisito del formulario. Esta entrega no sube fotografías a un backend real. El navegador no ofrece un permiso nativo separado para leer archivos; el cuadro **Permitir/Bloquear** corresponde a la cámara.
+En `/inspecciones`, **Seleccionar archivo** abre directamente el selector normal de archivos: no pide permiso de cámara, de modo que rechazarlo nunca bloquea la evidencia. **Tomar foto** solicita la cámara del dispositivo mediante `capture="environment"`. La interfaz valida el archivo y confirma su selección sin convertirlo en un requisito del formulario. Esta entrega no sube fotografías a un backend real. El navegador no ofrece un permiso nativo separado para leer archivos; el cuadro **Permitir/Bloquear** corresponde a la cámara.
 
 ## Geolocalización
 
@@ -20,7 +20,7 @@ En `/inspecciones`, el botón **Usar ubicación** activa la solicitud únicament
 
 ## Notificaciones
 
-`src/lib/notifications/client.ts` solicita permiso solo cuando se llama a `notifyInspectionChange`, nunca al cargar la aplicación. Si `Notification` no existe, el permiso es denegado o la construcción de la notificación falla, se ejecuta el callback de fallback. El fallback puede mostrar un mensaje dentro de la interfaz o registrar un aviso local; no usa un servicio push ni requiere secretos.
+`src/lib/notifications/client.ts` solicita permiso solo cuando se llama a `notifyInspectionChange`, nunca al cargar la aplicación. Si `Notification` no existe, el permiso es denegado o la construcción de la notificación falla, se ejecuta el callback de fallback. El fallback puede mostrar un mensaje dentro de la interfaz o registrar un aviso local; no usa un servicio push ni requiere credenciales.
 
 ## Pruebas y límites
 
@@ -28,23 +28,23 @@ En `/inspecciones`, el botón **Usar ubicación** activa la solicitud únicament
 
 Cuando una inspección se sincroniza después de pulsar **Guardar inspección**, la interfaz intenta mostrar una notificación de cambio. Si el permiso se deniega o la API no existe, muestra el aviso dentro de la aplicación.
 
-El endpoint de demostración de semanas anteriores continúa siendo sintético y volátil. Esta semana no se almacenan coordenadas ni se agregan credenciales, tokens o suscripciones push.
+El endpoint de demostración de semanas anteriores continúa siendo sintético y volátil. Esta semana no se almacenan coordenadas ni se agregan credenciales ni suscripciones push.
 
 ## Capacidades de la aplicación de inspecciones
 
 ## 1. Seleccionar archivo
 
-El botón **Seleccionar archivo** permite elegir una imagen para utilizarla como evidencia de una inspección. Antes de abrir el selector, la aplicación solicita permiso para acceder a la cámara mediante el navegador. Si el permiso se concede, se abre el selector de archivos para elegir una imagen JPEG, PNG o WebP.
+El botón **Seleccionar archivo** permite elegir una imagen para utilizarla como evidencia de una inspección. Abre directamente el selector de archivos, sin solicitar permiso de cámara, para elegir una imagen JPEG, PNG o WebP.
 
 La imagen seleccionada debe tener un tamaño máximo de 5 MiB. Si el archivo no cumple con el formato o tamaño permitido, la aplicación muestra un mensaje de error y no acepta la imagen. Cuando la selección es válida, se muestra el nombre del archivo en la pantalla.
 
-Si se rechaza el permiso de cámara, el selector no se abre en la implementación actual.
+Como no depende de ningún permiso, es el fallback cuando la cámara se bloquea.
 
 ## 2. Tomar foto
 
 El botón **Tomar foto** solicita permiso para utilizar la cámara del dispositivo. Si se concede el permiso, la aplicación detiene la transmisión de la cámara y abre el selector de imágenes configurado para utilizar la cámara trasera cuando el dispositivo lo permite.
 
-El usuario puede intentar capturar una fotografía y seleccionar una imagen válida. Si el permiso se rechaza o la cámara no está disponible, se muestra un mensaje que indica que puede seleccionarse un archivo, aunque esta alternativa también solicita el permiso de cámara en la implementación actual.
+El usuario puede intentar capturar una fotografía y seleccionar una imagen válida. Si el permiso se rechaza o la cámara no está disponible, se muestra un mensaje que indica que puede seleccionarse un archivo, y **Seleccionar archivo** sigue funcionando.
 
 La pantalla muestra el nombre de la evidencia seleccionada. En el código revisado, la imagen no se incorpora al registro guardado como un archivo persistente.
 
@@ -69,7 +69,7 @@ El permiso no garantiza por sí solo que la operación termine correctamente, ya
 
 Cuando el usuario presiona **Bloquear**, el navegador rechaza el acceso al recurso solicitado.
 
-- **Cámara:** la aplicación muestra un mensaje indicando que no se concedió el permiso o que se rechazó el acceso. No se abre el selector de evidencia.
+- **Cámara:** la aplicación muestra un mensaje indicando que no se concedió el permiso. **Seleccionar archivo** sigue disponible.
 - **Ubicación:** la aplicación muestra un mensaje que indica que se rechazó el permiso y que la inspección puede guardarse sin ubicación.
 
 La aplicación maneja estos casos mediante mensajes en pantalla para informar al usuario sobre el resultado.
@@ -78,7 +78,19 @@ La aplicación maneja estos casos mediante mensajes en pantalla para informar al
 
 Cuando se rechaza el permiso de ubicación, el usuario puede guardar la inspección sin coordenadas, siempre que complete los campos obligatorios.
 
-Cuando se rechaza el permiso de cámara, la aplicación informa que puede seleccionarse un archivo. Sin embargo, en la implementación revisada, el botón **Seleccionar archivo** también solicita el permiso de cámara. Por este motivo, si el permiso permanece bloqueado, no se puede abrir el selector mediante ese botón.
+Cuando se rechaza el permiso de cámara, la aplicación informa que puede seleccionarse un archivo y el botón **Seleccionar archivo** funciona sin ese permiso. Corregido en esta revisión: antes ese botón también pedía la cámara y quedaba bloqueado.
+
+## 6b. Decisiones, trade-offs y fallos encontrados
+
+| Decisión | Alternativa descartada | Motivo |
+| --- | --- | --- |
+| Permisos solo tras un clic | Pedir al cargar la página | Menos intrusivo; los navegadores penalizan los avisos sin gesto. |
+| Notificación local con fallback en la interfaz | Web Push con servidor | No hay secretos ni suscripciones; el límite es que solo avisa con la app abierta. |
+| Notificar solo con permiso `granted` | Crear siempre `new Notification` | `default` (diálogo descartado) no debe mostrar nada nativo; se usa el fallback. |
+| Ubicación de baja precisión, sin guardarla | Alta precisión y persistencia | Minimiza datos; no se envía al servidor. |
+| Selector de archivos independiente de la cámara | Pedir permiso antes | Fallo corregido: bloquear la cámara impedía adjuntar evidencia. |
+
+Límites: las APIs reales no se ejecutan en CI, solo dobles de prueba; la foto y la ubicación no se persisten en el registro.
 
 ## 7. Cámara y ubicación opcionales
 

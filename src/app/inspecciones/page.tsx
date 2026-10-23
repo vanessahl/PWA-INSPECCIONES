@@ -203,25 +203,10 @@ export default function InspectionsPage() {
     }
   };
 
-  const handleFileRequest = async () => {
-    setCapabilityNotice("Solicitando permiso antes de seleccionar la evidencia…");
-    try {
-      const stream = await requestCameraStream();
-      if (!stream) {
-        setCapabilityNotice("No se concedió el permiso; no se abrió el selector de evidencia.");
-        return;
-      }
-      stopCameraStream(stream);
-      setCapabilityNotice("Permiso concedido. Ahora selecciona una imagen.");
-      fileInputRef.current?.click();
-    } catch (error) {
-      const reason = cameraFailureReason(error);
-      setCapabilityNotice(
-        reason === "permission-denied"
-          ? "Se rechazó el permiso; no se abrió el selector de evidencia."
-          : "No fue posible solicitar el permiso; inténtalo nuevamente."
-      );
-    }
+  const handleFileRequest = () => {
+    // Elegir un archivo no requiere permiso de cámara: el selector nativo es el fallback.
+    setCapabilityNotice("Selecciona una imagen como evidencia opcional.");
+    fileInputRef.current?.click();
   };
 
   const records = state.status === "ready"
@@ -235,7 +220,7 @@ export default function InspectionsPage() {
 
   return (
     <AppShell>
-      <main className="page-shell">
+      <main className="page-shell" id="contenido">
         <header className="page-heading">
           <p className="eyebrow">Listado · renderizado en cliente</p>
           <h1>Inspecciones recientes</h1>
@@ -294,7 +279,7 @@ export default function InspectionsPage() {
               <span className="capability-label">Evidencia opcional</span>
               <div className="capability-buttons">
                 <button className="button-link button-secondary" type="button"
-                  onClick={() => void handleFileRequest()}>
+                  onClick={handleFileRequest}>
                   Seleccionar archivo
                 </button>
                 <button className="button-link button-secondary" type="button"

@@ -13,6 +13,7 @@ const detailLoading = await readFile(
   "utf8"
 );
 const loadingState = await readFile(resolve(root, "src/components/loading-state.tsx"), "utf8");
+const routeError = await readFile(resolve(root, "src/app/inspecciones/error.tsx"), "utf8");
 const syncEndpoint = await readFile(resolve(root, "src/app/api/inspecciones/sync/route.ts"), "utf8");
 
 assert.match(listPage, /^"use client";/);
@@ -38,4 +39,11 @@ assert.match(detailPage, /Inspección no encontrada/);
 assert.match(detailLoading, /LoadingState/);
 assert.match(loadingState, /role="status"/);
 assert.match(loadingState, /aria-live="polite"/);
+assert.match(routeError, /^"use client";/, "los límites de error deben ser Client Components");
+assert.match(routeError, /role="alert"/);
+assert.match(routeError, /onClick=\{reset\}/, "permite reintentar");
+// Anti hydration mismatch: el primer render no usa valores que difieren entre servidor y navegador.
+const firstRender = listPage.split("useEffect(")[0];
+assert.doesNotMatch(firstRender, /Date\.now|Math\.random|new Date\(|window\.|navigator\./);
+assert.match(listPage, /useState<ListState>\(\{ status: "loading" \}\)/);
 console.log("rendering.spec.ts: PASS");

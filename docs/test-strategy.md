@@ -1,0 +1,47 @@
+# Estrategia de pruebas — Semana 8
+
+## Flujo crítico
+
+Capturar una inspección sin conexión → guardarla en IndexedDB y en la outbox → sincronizarla al volver la red (`POST /api/inspecciones/sync`) con idempotencia, reintentos con backoff y resolución de conflictos. Es el comportamiento con mayor riesgo de pérdida de datos, por eso concentra las pruebas.
+
+## Pirámide
+
+| Nivel | Carpeta | Qué prueba | Qué aísla |
+| --- | --- | --- | --- |
+| Unitario | `tests/unit/` | `chooseConflictWinner`, `isInspectionRecord`, `enqueueInspection`, `createHttpSyncTransport` | Sin red ni IndexedDB; `fetch` y store simulados |
+| Integración | `tests/integration/` | Handler real de la ruta (400/409/idempotencia/revisiones); cola + `IndexedDbSyncStore` (con `fake-indexeddb`) + handler real | Sin servidor HTTP ni navegador |
+| E2E | `tests/e2e/` | `next start` sobre el build real: HTML, manifest, `sw.js`, sincronización por HTTP real, idempotencia y 409 | Sin navegador; IndexedDB simulado |
+
+Las pruebas de semanas 1–6 (`tests/*.spec.*`) se conservan y se ejecutan con `npm test`. Los nuevos archivos usan `node:test` ejecutado con `tsx`, sin dependencias nuevas.
+
+## Decisiones y trade-offs
+
+* **E2E sin navegador (Playwright).** Un navegador agrega ~300 MB de descarga, es más lento y más frágil en CI. Se prueba el servidor real y la lógica del cliente por HTTP; el costo es que **no** se valida la UI renderizada, el registro real del Service Worker ni la cámara/geolocalización. Esas siguen cubiertas por las pruebas manuales de `README.md` (semana 6).
+* **Archivos explícitos en los scripts `test:*`.** Node 20 no expande globs en `--test`; listar archivos evita diferencias entre sistemas operativos.
+* **Reloj inyectado** (`now`) en `syncPending`: elimina esperas reales del backoff y hace las pruebas deterministas.
+* **Estado del servidor en memoria.** La ruta guarda revisiones en un `Map` por proceso; por eso cada prueba usa IDs y claves únicos, y el E2E arranca un proceso nuevo.
+
+## Supuestos
+
+* Todos los datos son sintéticos (`synthetic-*`, `integration-*`, `e2e-*`, y las `inspection-00x` del repositorio).
+* Node.js 20+; puerto 3107 libre (configurable con `E2E_PORT`).
+* `npm run build` se ejecuta antes de `npm run test:e2e`.
+
+## Límites y fallos conocidos
+
+* No hay pruebas de UI en navegador ni de accesibilidad.
+* IndexedDB real de cada navegador (cuotas, modo privado, transacciones interrumpidas) no se prueba; se usa `fake-indexeddb`.
+* La idempotencia del servidor vive en memoria: se pierde al reiniciar, y no hay pruebas de concurrencia entre pestañas.
+* La ruta `/api/inspecciones/sync` no tiene autenticación (fuera del alcance académico).
+* Las pruebas de integración que usan `inspection-001` y `inspection-002` dependen de que los datos semilla no cambien (fecha 2026-08-28 / 2026-08-27, revisión 1).
+
+## Cómo reproducir
+
+```bash
+npm ci
+npm run build
+npm run test:all
+npm run verify
+```
+
+CI (`.github/workflows/academic-evaluation.yml`) ejecuta los mismos pasos en cada push y PR.

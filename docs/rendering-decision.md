@@ -26,12 +26,41 @@ El detalle usa SSR porque el identificador forma parte de la ruta y el contenido
 | Costo actual | Más JavaScript y una transición de carga | Menor JavaScript, pero depende de resolver la ruta |
 | Prueba | Frontera `use client`, `useEffect` y estados | Ausencia de `use client`, `params` y búsqueda por `id` |
 
+## Métrica de carga repetible
+
+`tests/e2e/rendering-live.test.ts` arranca `next start` sobre el build, hace 10 peticiones a cada ruta y guarda las medianas en `reports/rendering-metrics.json`. Se ejecuta con:
+
+```bash
+npm run build
+npm run test:e2e
+```
+
+Medición de referencia (servidor local, Windows, datos sintéticos; varía según la máquina):
+
+| Ruta | Render | Mediana TTFB | Mediana total |
+| --- | --- | --- | --- |
+| `/inspecciones` | CSR (HTML estático con `LoadingState`) | 6.2 ms | 7.4 ms |
+| `/inspecciones/inspection-001` | SSR (HTML con los datos) | 44.2 ms | 49.0 ms |
+
+Cómo leerla: el servidor responde más rápido el listado CSR porque solo envía el shell, pero el usuario no ve datos hasta que el navegador hidrata y ejecuta `useEffect`. El detalle SSR cuesta más en el servidor, pero el HTML ya trae el contenido. La prueba solo exige una mediana menor a 2 s; las cifras comparan rutas y no equivalen a una medición en red móvil real.
+
+## Evidencia de comportamiento CSR/SSR
+
+La misma prueba comprueba sobre el servidor real que el HTML inicial de `/inspecciones` contiene "Cargando inspecciones" y no los registros, mientras que el de `/inspecciones/inspection-001` ya incluye "Laboratorio de Redes". También verifica que dos respuestas consecutivas son idénticas (sin fechas ni valores aleatorios en el primer render), que es la causa más común de *hydration mismatch*; `rendering.spec.ts` además exige que el primer render del listado no use `window`, `navigator`, `Date` ni `Math.random`.
+
+## Estados de error
+
+- Listado: `/inspecciones?estado=error` reproduce el error controlado.
+- Ambas rutas: `src/app/inspecciones/error.tsx` es un límite de error de Next.js; si el render lanza una excepción muestra un aviso con `role="alert"` y un botón para reintentar, en lugar de una pantalla en blanco.
+- Detalle inexistente: muestra "Inspección no encontrada"; el servidor responde 200 porque la ruta también debe poder mostrar inspecciones guardadas solo en IndexedDB (semana 5), que el servidor no conoce. Es un límite aceptado, no un 404 real.
+
 ## Supuestos y límites
 
 - Los datos son locales, sintéticos y estáticos; no se simula una API ni latencia de red.
 - El listado muestra carga durante la inicialización en el navegador; los estados `error` y vacío se reproducen con `/inspecciones?estado=error` y `/inspecciones?estado=vacio`.
 - El detalle inexistente se reproduce con `/inspecciones/id-inexistente`.
-- Las pruebas automatizadas verifican el contrato de archivos y estados, pero no sustituyen una comprobación visual en un navegador.
+- Las pruebas estáticas verifican el contrato de archivos y las pruebas E2E el HTML real, pero ninguna sustituye una comprobación visual en un navegador (no se prueba la hidratación en un navegador real).
+- No hay un `loading.tsx` visible en el detalle porque los datos son locales y la respuesta es inmediata; existe para cuando la fuente de datos sea remota.
 - La estrategia offline de la Semana 3 conserva las rutas visitadas; no agrega sincronización de inspecciones.
 
 ## Fallos encontrados
@@ -43,9 +72,9 @@ La prueba de renderizado ya existía en el árbol local, aunque no estaba conect
 Se ejecutan `npm ci`, `npm test`, `npm run build` y `make verify`. La prueba `tests/rendering.spec.ts` comprueba la frontera CSR/SSR, los estados de carga, los enlaces al detalle y los estados de error y vacío. GitHub Actions debe ejecutarse en el repositorio después de publicar el commit; no se puede confirmar un resultado remoto desde un árbol local sin publicar cambios.
 
 
-# Decisión de renderizado
+## Pruebas manuales en navegador
 
-## Pruebas realizadas
+### Pruebas realizadas
 
 Para comprobar el funcionamiento de las páginas de inspecciones, se realizaron pruebas directamente desde el navegador utilizando las diferentes rutas indicadas. El objetivo fue revisar qué información se muestra en cada caso y verificar el comportamiento de la aplicación cuando existen registros, cuando ocurre un error, cuando no hay resultados y cuando se consulta una inspección que no existe.
 
