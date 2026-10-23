@@ -10,6 +10,8 @@ Durante la Semana 5 se agregó una outbox durable en IndexedDB, reintentos idemp
 
 Durante la Semana 6 se agregaron capacidades opcionales de cámara, geolocalización y notificaciones con permisos mínimos, fallback y datos sintéticos. Las decisiones y límites se explican en `docs/capabilities.md`.
 
+Durante la Semana 8 se agregaron pruebas unitarias, de integración y E2E del flujo crítico (captura offline → outbox → sincronización) y un workflow de CI. La estrategia, supuestos y límites están en `docs/test-strategy.md`.
+
 ## Requisitos
 
 * Node.js 20 o superior
@@ -236,3 +238,44 @@ La inspección debe guardarse correctamente si se completaron todos los campos o
 **Resultado esperado:**
 
 La aplicación debe abrir el detalle correspondiente a la inspección seleccionada y mostrar la información guardada. Los datos deben corresponder al registro seleccionado y no a otra inspección.
+
+## Semana 8: pruebas automatizadas y CI
+
+### Setup
+
+```bash
+npm ci
+```
+
+### Ejecución
+
+| Comando | Qué ejecuta |
+| --- | --- |
+| `npm run test:unit` | `tests/unit/`: política de conflictos, validación de esquema, cola y transporte HTTP |
+| `npm run test:integration` | `tests/integration/`: ruta `/api/inspecciones/sync` y cola + IndexedDB (`fake-indexeddb`) + API |
+| `npm run build` y `npm run test:e2e` | `tests/e2e/`: levanta `next start` en el puerto 3107 (`E2E_PORT` lo cambia) y prueba el flujo por HTTP real |
+| `npm test` | Pruebas de semanas anteriores (se conservan) |
+| `npm run test:all` | Todo lo anterior en orden |
+| `make verify` | `npm run verify`: valida artefactos y genera `reports/verification.json` |
+
+### Verificación
+
+```bash
+npm ci
+npm run build
+npm run test:all
+make verify
+```
+
+Si `make` no está disponible (Windows), `npm run verify` es el equivalente exacto.
+
+### Evidencia
+
+* Workflow: `.github/workflows/academic-evaluation.yml` (corre en `push`, `pull_request` y manualmente; sube `reports/` como artefacto).
+* Estrategia, decisiones, supuestos y límites: `docs/test-strategy.md`.
+* Evidencia individual: `evidence/individual.md`.
+* Todos los datos son sintéticos; no hay credenciales ni PII.
+
+### Flujo de ramas
+
+Cada integrante trabaja en su propia rama (por ejemplo `semana-08-jessica`) y entra a `main` solo mediante Pull Request. No se hacen commits directos a `main`.

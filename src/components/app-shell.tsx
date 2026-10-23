@@ -13,6 +13,7 @@ const stateLinks = [
 export function AppShell({ children }: AppShellProps) {
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#contenido">Saltar al contenido</a>
       <header className="app-header">
         <Link className="brand" href="/" aria-label="Ir al inicio de Inspecciones">
           <span className="brand-mark" aria-hidden="true">I</span>

@@ -66,7 +66,7 @@ La arquitectura futura debe permitir que un tecnico consulte datos previamente a
 | --- | --- | --- |
 | RNF-01 | Reproducibilidad | En Node.js 20 LTS, `npm ci`, `npm test` y `npm run build` terminan con codigo `0` en un clon limpio. |
 | RNF-02 | Accesibilidad | La estructura usa un `main`, encabezados en orden logico y cada seccion tiene un nombre accesible; una revision con Lighthouse debe obtener al menos 90/100 en accesibilidad cuando se incorpore a CI. |
-| RNF-03 | Seguridad | No se solicitan, transmiten ni almacenan credenciales o datos personales; `git ls-files` no debe incluir archivos `.env` con secretos. |
+| RNF-03 | Seguridad | No se solicitan, transmiten ni almacenan credenciales o datos personales; `git ls-files` no debe incluir archivos `.env` con credenciales. |
 | RNF-04 | Privacidad | Los datos del repositorio y de las demostraciones deben ser sinteticos; ninguna persona, matricula, correo, telefono, fotografia o ubicacion institucional exacta puede aparecer en codigo, documentos o evidencias. |
 | RNF-05 | Rendimiento | En una compilacion de produccion, la ruta inicial debe ser utilizable en menos de 3 s bajo una simulacion movil de red Fast 3G y CPU 4x; se medira con Lighthouse antes de la entrega final. |
 | RNF-06 | Operacion offline futura | La futura PWA debe permitir abrir la ultima lista sincronizada sin red y conservar localmente una inspeccion pendiente durante al menos un reinicio del navegador; la prueba se ejecutara con DevTools en modo Offline. |
