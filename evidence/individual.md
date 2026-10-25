@@ -253,3 +253,19 @@
 - **Limitación:** Las pruebas no revisan la interfaz en un navegador real y se usa una versión simulada de IndexedDB. Además, la idempotencia del servidor se pierde al reiniciarlo y algunos datos de prueba dependen de los registros preparados. También tuve un problema con los saltos de línea al actualizar la lista de archivos, pero lo detecté y lo corregí. GitHub Actions debe revisarse después de subir los cambios.
 
 - **Uso de IA:** Utilicé Claude.IA para ayudarme a preparar las pruebas, el workflow y la documentación. Después revisé el código y ejecuté los comandos para comprobar que las pruebas funcionaran correctamente.
+
+
+
+## Semana 8 - Vanessa Hernández López
+
+- **Commit SHA evaluado:** `5fb81177cc4f471aa1aef48fd8124254b2cc3c5f`
+
+- **Contribución:** Agregué las pruebas unitarias para la validación de evidencias y actualicé el script `test:unit` en `package.json` para incluir el nuevo archivo `tests/unit/evidence.test.ts`. También ejecuté las pruebas unitarias, las pruebas de integración y la verificación de la PWA para comprobar los resultados.
+
+- **Decisión técnica:** Utilicé `node:test` con `tsx` para ejecutar las pruebas sin agregar nuevas dependencias. Las pruebas de evidencia comprueban que se acepten imágenes JPEG, PNG y WebP válidas, y que se rechacen archivos con formatos no permitidos, vacíos o mayores de 5 MiB. También verifiqué que se acepte una imagen que mida exactamente 5 MiB.
+
+- **Prueba ejecutada y resultado:** Ejecuté `npm run test:unit` y obtuve 19 pruebas aprobadas, sin fallos. Después ejecuté `npm run test:integration` y obtuve 10 pruebas aprobadas, sin fallos. Finalmente, ejecuté `npm run verify` y la verificación de la PWA terminó con resultado `PASS`. Se generó el reporte `reports/verification.json`.
+
+- **Limitación:** Las pruebas unitarias e integración no sustituyen las pruebas en un navegador real. Para la integración se utiliza `fake-indexeddb`, por lo que no se comprueba el comportamiento de IndexedDB real en todos los navegadores y dispositivos. Tampoco se validan con estas pruebas la cámara, la geolocalización ni la interfaz completa en un navegador.
+
+- **Uso de IA:** Utilicé ChatGPT como apoyo para revisar los resultados de las pruebas, corregir la configuración del script `test:unit` y organizar la documentación de mi participación. Después ejecuté los comandos en mi entorno local para comprobar los resultados.
