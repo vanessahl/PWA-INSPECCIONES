@@ -87,30 +87,30 @@ La cola aplica backoff exponencial, claves idempotentes, leases recuperables y u
 
 ## Verificación
 
-Para comprobar que el proyecto funciona correctamente se ejecutan:
+Para reproducir la verificación de Semana 8:
 
 ```bash
 npm ci
-npm test
+npm run lint
+npm run typecheck
 npm run build
+npm test
+npm run test:unit
+npm run test:integration
+npm run test:coverage
+npx playwright install chromium
+npm run test:e2e
 npm run verify
 make verify
 ```
 
 En Windows sin GNU Make, ejecuta `npm run verify`; es el equivalente exacto de `make verify` según el target `verify` del Makefile.
 
-GitHub Actions ejecuta los mismos gates en `.github/workflows/week-05-w05-sync-data.yml` al publicar cambios.
+`npm run test:e2e` levanta `next start` sobre el build compilado y corre las comprobaciones HTTP y las pruebas de interfaz en Chromium. Las pruebas de interfaz guardan una inspección con el contexto offline, recargan la pantalla, reconectan y verifican que quede sincronizada una sola vez; también simulan el rechazo de geolocalización.
 
-También se puede revisar el comportamiento offline desde las herramientas de desarrollo del navegador.
+`npm run test:coverage` genera cobertura de unitarias e integración en `reports/coverage/`. Los comandos de lint, tipos, build, pruebas y `make verify` también se ejecutan en `.github/workflows/academic-evaluation.yml`. El workflow publica `reports/` como artefacto incluso si falla una etapa.
 
-La prueba de renderizado se ejecuta dentro de `npm test` y valida que el listado sea CSR, que el detalle sea SSR y que existan los estados de carga y error.
-Las pruebas de renderizado y sincronización forman parte de `npm test`; cubren el formulario, IndexedDB simulado, endpoint, duplicados, reintentos, conflictos y recuperación tras expirar un lease. Para la comprobación manual offline, desactiva la red desde DevTools, guarda otra inspección en `/inspecciones` y restablece la conexión para verla sincronizada.
-
-La prueba de capacidades forma parte de `npm test` y cubre la ausencia de APIs del navegador, el rechazo de permisos, la validación de evidencia de imagen y el fallback de notificaciones. Las APIs de cámara, geolocalización y notificaciones solo se solicitan desde una acción explícita del usuario.
-
-En esta revisión se ejecutaron `npm ci`, `npm test`, `npm run build` y `npm run verify`; todos terminaron correctamente. `npm ci` informó dos vulnerabilidades en dependencias (una alta y una crítica). Este entorno no tiene GNU Make ni GitHub CLI, y no fue posible despachar un workflow de Actions desde las herramientas disponibles; por eso el estado de Actions debe verificarse en GitHub cuando se publique el commit. `npm run verify` es el equivalente local exacto de `make verify`.
-
-Para la Semana 6, GitHub Actions usa `.github/workflows/week-06-w06-device-push.yml`. El flujo instala con `npm ci --ignore-scripts --no-audit --no-fund`, ejecuta el build y valida los artefactos obligatorios. En Windows sin GNU Make, `npm run verify` sigue siendo el equivalente exacto de `make verify`.
+La revisión local de este incremento pasó `npm ci`, lint, comprobación de tipos, build, pruebas anteriores, unitarias (19), integración (10), cobertura y E2E. Las dos pruebas de interfaz usan Chromium. Las vulnerabilidades informadas por npm deben revisarse antes de producción; no se ejecutó una actualización automática de dependencias.
 
 ## Evidencia
 
@@ -251,9 +251,11 @@ npm ci
 
 | Comando | Qué ejecuta |
 | --- | --- |
-| `npm run test:unit` | `tests/unit/`: política de conflictos, validación de esquema, cola y transporte HTTP |
+| `npm run lint` / `npm run typecheck` | ESLint; TypeScript de la aplicación y de la nueva prueba de interfaz |
+| `npm run test:unit` | `tests/unit/`: política de conflictos, validación de esquema/evidencia, cola y transporte HTTP |
 | `npm run test:integration` | `tests/integration/`: ruta `/api/inspecciones/sync` y cola + IndexedDB (`fake-indexeddb`) + API |
-| `npm run build` y `npm run test:e2e` | `tests/e2e/`: levanta `next start` en los puertos fijos 3107–3109 (`E2E_PORT` lo cambia en una ejecución aislada) y prueba por HTTP la página principal, inspecciones, detalle, manifest y sincronización |
+| `npm run build` y `npm run test:e2e` | `tests/e2e/`: `next start` en los puertos 3107–3110; contratos HTTP y Chromium real para flujo offline-recarga-reconexión y geolocalización denegada |
+| `npm run test:coverage` | Cobertura unitarias/integración en `reports/coverage/` |
 | `npm test` | Pruebas de semanas anteriores (se conservan) |
 | `npm run test:all` | Todo lo anterior en orden |
 | `make verify` | `npm run verify`: valida artefactos y genera `reports/verification.json` |
@@ -262,8 +264,15 @@ npm ci
 
 ```bash
 npm ci
+npm run lint
+npm run typecheck
 npm run build
-npm run test:all
+npm test
+npm run test:unit
+npm run test:integration
+npm run test:coverage
+npx playwright install chromium
+npm run test:e2e
 make verify
 ```
 
@@ -271,11 +280,11 @@ Si `make` no está disponible (Windows), `npm run verify` es el equivalente exac
 
 ### Evidencia
 
-* Workflow: `.github/workflows/academic-evaluation.yml` (corre en `push`, `pull_request` y manualmente; instala, compila, ejecuta todas las pruebas y sube `reports/` como artefacto).
-* Estrategia, decisiones, supuestos y límites: `docs/test-strategy.md`.
+* Workflow: `.github/workflows/academic-evaluation.yml` (corre en `push`, `pull_request` y manualmente; incluye lint, tipos, build, pruebas, cobertura y sube `reports/` aun ante fallo).
+* Estrategia, matriz de riesgos, diagnóstico, defecto controlado, supuestos y límites: `docs/test-strategy.md`.
 * Evidencia individual: `evidence/individual.md`.
 * Todos los datos son sintéticos; no hay credenciales ni PII.
 
 ### Flujo de ramas
 
-Cada integrante trabaja en su propia rama (por ejemplo `semana-08-jessica`) y entra a `main` solo mediante Pull Request. No se hacen commits directos a `main`.
+Para la Semana 8, el equipo está integrando en `dev`. Cada integrante crea su rama de trabajo a partir de `dev` y abre un Pull Request con base `dev`; no se hacen commits directos a `main`/`master` ni se cambia la rama objetivo sin confirmarlo con el docente. Aunque GitHub muestre `main` como rama predeterminada del repositorio, la rama de integración acordada para este incremento es `dev`.
