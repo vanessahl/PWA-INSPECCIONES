@@ -50,3 +50,47 @@ npm run verify
 ```
 
 CI (`.github/workflows/academic-evaluation.yml`) ejecuta los mismos pasos en cada push y PR.
+
+## Resultados de ejecución — Semana 8
+
+Se ejecutaron las pruebas unitarias, las pruebas de integración y la verificación de la PWA para comprobar el funcionamiento de la validación de inspecciones, la cola de sincronización y el manejo de conflictos.
+
+### Pruebas unitarias
+
+**Comando ejecutado:**
+
+```bash
+npm run test:unit
+```
+
+**Resultado:** PASS. Se aprobaron 19 de 19 pruebas, sin fallos.
+
+Estas pruebas comprobaron la resolución de conflictos según la fecha de actualización, el rechazo de fechas inválidas, la validación de imágenes permitidas y el funcionamiento de la cola y del transporte HTTP. También se verificó que las inspecciones cumplan con el esquema esperado.
+
+### Pruebas de integración
+
+**Comando ejecutado:**
+
+```bash
+npm run test:integration
+```
+
+**Resultado:** PASS. Se aprobaron 10 de 10 pruebas, sin fallos.
+
+Se comprobó la integración entre IndexedDB, la cola de sincronización y la API. También se verificaron los reintentos después de un fallo de conexión, la prevención de duplicados mediante claves de idempotencia, las respuestas HTTP 400 y 409, y la actualización de revisiones.
+
+### Verificación de la PWA
+
+**Comando ejecutado:**
+
+```bash
+npm run verify
+```
+
+**Resultado:** PASS. La verificación de la PWA terminó correctamente y se generó el reporte `reports/verification.json`.
+
+### Conclusión
+
+Los resultados obtenidos indican que las pruebas unitarias y de integración ejecutadas pasaron correctamente y que la verificación de la PWA fue satisfactoria. Estas pruebas respaldan el funcionamiento de la validación de datos y de la sincronización de inspecciones, incluidos algunos escenarios de desconexión y resolución de conflictos.
+
+Los resultados no sustituyen las pruebas manuales en un navegador real, ni comprueban por sí solos el funcionamiento de la cámara, la geolocalización o el comportamiento de IndexedDB en todos los dispositivos.

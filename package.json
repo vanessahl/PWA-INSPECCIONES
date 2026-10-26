@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "test": "node tests/starter.spec.mjs && tsx tests/manifest.spec.ts && tsx tests/service-worker.spec.ts && tsx tests/offline.spec.ts && tsx tests/rendering.spec.ts && tsx tests/sync.spec.ts && tsx tests/capabilities.spec.ts",
-    "test:unit": "tsx --test --test-reporter=spec tests/unit/conflict-policy.test.ts tests/unit/schema.test.ts tests/unit/queue.test.ts",
+    "test:unit": "tsx --test --test-reporter=spec tests/unit/conflict-policy.test.ts tests/unit/schema.test.ts tests/unit/queue.test.ts tests/unit/evidence.test.ts",
     "test:integration": "tsx --test --test-reporter=spec tests/integration/sync-route.test.ts tests/integration/offline-sync.test.ts",
     "test:e2e": "tsx --test --test-reporter=spec tests/e2e/critical-flow.test.ts tests/e2e/rendering-live.test.ts tests/e2e/application-contract.test.ts",
     "test:all": "npm test && npm run test:unit && npm run test:integration && npm run build && npm run test:e2e",
