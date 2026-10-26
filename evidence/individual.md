@@ -238,50 +238,35 @@
 - **Limitación:** Las pruebas de cámara y geolocalización dependen de que las funciones estén implementadas, de la compatibilidad del navegador y de los permisos concedidos por el usuario. 
 - **Uso de IA:** Utilicé ChatGPT como apoyo para organizar la documentación, comprender los casos de prueba manual y redactar el registro de resultados.
 
+# Semana 8 - Jessica Juárez Rodríguez
 
+- **Commit de mi aportación:** `9e6f5bbef832370bc1802c56eecdbe313fa189be`.
+- **Último commit de mi rama:** `ea4f3b23d7cf4adb954ce4e6dcee20cda105ad54`, en la rama `semana-08-jessica`. Este commit contiene la actualización de mi evidencia.
+- **Qué hice:** Agregué pruebas unitarias y de integración para revisar el funcionamiento sin conexión a internet y la sincronización de datos. También agregué pruebas E2E por HTTP y desde la interfaz, configuré las pruebas automáticas de GitHub Actions y actualicé la documentación de la Semana 8.
+- **Decisiones técnicas:** Utilicé `node:test` y `tsx` para las pruebas unitarias y de integración. También utilicé `fake-indexeddb` para probar el almacenamiento de datos y Playwright con Chromium para comprobar el funcionamiento de la aplicación desde un navegador.
+- **Pruebas que realicé inicialmente:** Ejecuté `npm ci`, la compilación del proyecto, `npm test`, las pruebas unitarias, las de integración, las pruebas E2E por HTTP y `npm run verify`. En esa primera versión todavía faltaban las pruebas desde un navegador y las pruebas para revisar qué sucede cuando se deniegan los permisos.
+- **Pruebas de la versión actual:** Ejecuté `npm ci`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm test`, las pruebas unitarias, las de integración, la cobertura de código, las pruebas E2E desde la interfaz y `npm run verify`. También revisé el comportamiento ante un error controlado.
+- **Resultados:** Las pruebas unitarias reportaron 19 casos y las de integración, 10. También se registraron 29 casos de cobertura y 2 escenarios de pruebas E2E desde la interfaz. La suite actual reporta 15 pruebas E2E aprobadas.
+- **Qué comprueban las pruebas:** Permiten revisar el funcionamiento sin conexión, la recarga de la aplicación, la reconexión y la alternativa que se muestra cuando se deniega el permiso de ubicación. Sin embargo, no garantizan el funcionamiento en todos los navegadores ni comprueban el uso real de la cámara, la ubicación o las notificaciones.
+- **Limitaciones:** El backend de demostración guarda algunos datos en memoria, por lo que estos se pierden al reiniciar el proceso. La denegación del permiso de ubicación se simula y no se utilizan datos personales. Además, la cobertura de código no incluye la interfaz ni el navegador.
+- **Uso de IA:** Utilicé Claude.AI como apoyo para revisar la estrategia de pruebas, agregar pruebas con Playwright, configurar las herramientas de revisión y corregir la evidencia.
 
-- ## Semana 8 - Jessica Juarez Rodriguez
+# Semana 8 - Ángel Gabriel Guzmán Miguel
 
-- **Commit SHA evaluado:** `9e6f5bbef832370bc1802c56eecdbe313fa189be`
+- **Commit de su aportación:** `1db41cf03f3b5f7d53c40db1b5f8d336f11b9801`. Este cambio integra el commit `d89d8b4afd70d4b872c5ba0690a2ff5ca665bb95` de su rama.
+- **Qué hizo:** Agregó el archivo `application-contract.test.ts` para comprobar las rutas de la aplicación, el manifest y el contrato de sincronización mediante solicitudes HTTP. También actualizó la documentación y la lista de pruebas.
+- **Decisión técnica:** Utilizó `node:test` y `next start` para comprobar las rutas y respuestas de la aplicación mediante HTTP, sin necesidad de abrir un navegador.
+- **Pruebas realizadas:** Ejecutó `npm run build`, `npm run test:e2e` y `npm run verify`. En su evidencia reportó 13 pruebas E2E aprobadas y un resultado `PASS` en la verificación de esa versión.
+- **Qué comprueban las pruebas:** Permiten comprobar que las rutas y el contrato de sincronización respondan correctamente mediante HTTP. Sin embargo, no comprueban la interacción con los controles de la interfaz desde un navegador.
+- **Limitaciones:** Sus pruebas no incluían la interacción con la interfaz desde un navegador. Además, el backend de demostración conserva los datos solamente mientras el proceso sigue funcionando.
+- **Uso de IA:** Declaró el uso de Codex/ChatGPT de OpenAI como apoyo para identificar qué debía probar, organizar las pruebas y redactar la documentación. También indicó que debía revisar el código y ejecutar los comandos para comprobar los resultados.
 
-- **Contribución:** Hice las pruebas unitarias (`tests/unit/`), de integración (`tests/integration/`) y E2E (`tests/e2e/`) para comprobar que las inspecciones se guarden sin internet y se sincronicen después. También agregué el workflow `.github/workflows/academic-evaluation.yml` y actualicé la documentación y el README.
+# Semana 8 - Vanessa Hernández López
 
-- **Decisión técnica:** Usé `node:test` y `tsx` para hacer las pruebas sin instalar más dependencias. En las pruebas E2E inicié el servidor y revisé su respuesta por HTTP. Elegí esta opción porque es más rápida para ejecutar las pruebas automáticamente. También usé un reloj controlado para probar los reintentos sin tener que esperar.
-
-- **Prueba ejecutada y resultado:** Ejecuté `npm ci`, `npm run build`, `npm test`, `npm run test:unit` (14 pruebas OK), `npm run test:integration` (10 OK), `npm run test:e2e` (4 OK) y `npm run verify` (PASS). En Windows, `npm run verify` es el comando para comprobar que todo funcione correctamente.
-
-- **Limitación:** Las pruebas no revisan la interfaz en un navegador real y se usa una versión simulada de IndexedDB. Además, la idempotencia del servidor se pierde al reiniciarlo y algunos datos de prueba dependen de los registros preparados. También tuve un problema con los saltos de línea al actualizar la lista de archivos, pero lo detecté y lo corregí. GitHub Actions debe revisarse después de subir los cambios.
-
-- **Uso de IA:** Utilicé Claude.IA para ayudarme a preparar las pruebas, el workflow y la documentación. Después revisé el código y ejecuté los comandos para comprobar que las pruebas funcionaran correctamente.
-
-<<<<<<< HEAD
-## Semana 8 - Angel Gabriel Guzman Miguel
-
-- **Commit SHA evaluado:** [].
-
-- **Contribución:** Agregué `tests/e2e/application-contract.test.ts` para validar por HTTP el build real de la página principal, el listado de inspecciones, el detalle de una inspección, el manifest instalable y el endpoint de sincronización. Actualicé `test:e2e` para incorporar esta suite, ajusté el artefacto de CI para conservar todos los reportes y completé la documentación de estrategia y README.
-
-- **Decisión técnica:** Elegí E2E por contrato HTTP con `node:test` y `next start`, sin un navegador automatizado. El helper arranca la aplicación compilada en un puerto fijo y la prueba confirma contratos públicos importantes: HTML de rutas, manifest, idempotencia, conflicto `409` y validación `400` del endpoint.
-
-- **Pruebas ejecutadas y resultado:** Ejecuté `npm run build`, `npm run test:e2e` y `npm run verify`. La compilación terminó correctamente con Next.js 14.2.35. Las 13 pruebas E2E pasaron, incluyendo las cuatro pruebas nuevas de contrato. La verificación terminó con `Verificación de PWA: PASS` y generó `reports/verification.json`.
-
-- **Limitación:** Estas pruebas no controlan un navegador real: no validan interacción visual, registro efectivo del Service Worker, IndexedDB nativo, cámara, ubicación ni notificaciones. El endpoint de demostración conserva estado sólo en memoria durante la vida del proceso.
-
-- **Uso de IA:** Utilicé Codex/ChatGPT de OpenAI como apoyo para identificar contratos críticos, estructurar las pruebas y redactar la documentación. Revisé los cambios y validé personalmente los resultados de compilación, E2E y verificación.  
-=======
-
-
-## Semana 8 - Vanessa Hernández López
-
-- **Commit SHA evaluado:** `5fb81177cc4f471aa1aef48fd8124254b2cc3c5f`
-
-- **Contribución:** Agregué las pruebas unitarias para la validación de evidencias y actualicé el script `test:unit` en `package.json` para incluir el nuevo archivo `tests/unit/evidence.test.ts`. También ejecuté las pruebas unitarias, las pruebas de integración y la verificación de la PWA para comprobar los resultados.
-
-- **Decisión técnica:** Utilicé `node:test` con `tsx` para ejecutar las pruebas sin agregar nuevas dependencias. Las pruebas de evidencia comprueban que se acepten imágenes JPEG, PNG y WebP válidas, y que se rechacen archivos con formatos no permitidos, vacíos o mayores de 5 MiB. También verifiqué que se acepte una imagen que mida exactamente 5 MiB.
-
-- **Prueba ejecutada y resultado:** Ejecuté `npm run test:unit` y obtuve 19 pruebas aprobadas, sin fallos. Después ejecuté `npm run test:integration` y obtuve 10 pruebas aprobadas, sin fallos. Finalmente, ejecuté `npm run verify` y la verificación de la PWA terminó con resultado `PASS`. Se generó el reporte `reports/verification.json`.
-
-- **Limitación:** Las pruebas unitarias e integración no sustituyen las pruebas en un navegador real. Para la integración se utiliza `fake-indexeddb`, por lo que no se comprueba el comportamiento de IndexedDB real en todos los navegadores y dispositivos. Tampoco se validan con estas pruebas la cámara, la geolocalización ni la interfaz completa en un navegador.
-
-- **Uso de IA:** Utilicé ChatGPT como apoyo para revisar los resultados de las pruebas, corregir la configuración del script `test:unit` y organizar la documentación de mi participación. Después ejecuté los comandos en mi entorno local para comprobar los resultados.
->>>>>>> origin/dev
+- **Commit de su aportación:** `5fb81177cc4f471aa1aef48fd8124254b2cc3c5f`. Después, actualizó la documentación de la estrategia de pruebas en el commit `078d992`.
+- **Qué hizo:** Agregó el archivo `evidence.test.ts` para comprobar la validación de imágenes en formatos JPEG, PNG y WebP. También probó qué sucede cuando el archivo está vacío o supera el límite de 5 MiB. Además, actualizó el comando para ejecutar las pruebas unitarias y la documentación.
+- **Decisión técnica:** Utilizó `node:test` y `tsx` para realizar las pruebas sin agregar nuevas dependencias.
+- **Pruebas realizadas:** Ejecutó `npm run test:unit`, que reportó 19 pruebas; `npm run test:integration`, que reportó 10, y `npm run verify`, que terminó con el resultado `PASS`.
+- **Qué comprueban las pruebas:** Permiten revisar que la aplicación valide correctamente los archivos de imagen y comprobar los resultados de las pruebas de integración.
+- **Limitaciones:** Estas pruebas no comprueban por sí solas el funcionamiento de IndexedDB en todos los navegadores, la interfaz completa ni los permisos reales del dispositivo.
+- **Uso de IA:** Declaró el uso de ChatGPT como apoyo para revisar los resultados, configurar el comando de las pruebas unitarias y organizar la evidencia. También indicó que debía ejecutar los comandos para comprobar los resultados.

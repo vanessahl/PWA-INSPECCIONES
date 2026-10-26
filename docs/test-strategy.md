@@ -1,96 +1,79 @@
 # Estrategia de pruebas — Semana 8
 
-## Flujo crítico
+## Diagnóstico y alcance
 
-Capturar una inspección sin conexión → guardarla en IndexedDB y en la outbox → sincronizarla al volver la red (`POST /api/inspecciones/sync`) con idempotencia, reintentos con backoff y resolución de conflictos. Es el comportamiento con mayor riesgo de pérdida de datos, por eso concentra las pruebas.
+La revisión de la versión integrada en `dev` confirmó pruebas unitarias, integración, contratos HTTP y un workflow verde. Faltaban una prueba automatizada desde un navegador real, pasos explícitos de lint y tipos, cobertura como artefacto y evidencia reproducible de un defecto controlado. También se encontraron marcadores de conflicto Git en `evidence/individual.md` y una descripción del flujo de ramas que decía `main`, aunque la integración de esta semana se hizo en `dev`.
 
-## Pirámide
+Esta revisión agrega esos casos en la copia local. Los datos, nombres y operaciones de prueba son sintéticos. La ejecución de Actions correspondiente a la revisión anterior está en [run 40262409901](https://github.com/vanessahl/PWA-INSPECCIONES/actions/runs/40262409901); no corresponde a estos cambios locales. La CI del SHA final debe ejecutarse después de integrar los cambios.
 
-| Nivel | Carpeta | Qué prueba | Qué aísla |
-| --- | --- | --- | --- |
-| Unitario | `tests/unit/` | `chooseConflictWinner`, `isInspectionRecord`, `enqueueInspection`, `createHttpSyncTransport` | Sin red ni IndexedDB; `fetch` y store simulados |
-| Integración | `tests/integration/` | Handler real de la ruta (400/409/idempotencia/revisiones); cola + `IndexedDbSyncStore` (con `fake-indexeddb`) + handler real | Sin servidor HTTP ni navegador |
-| E2E | `tests/e2e/` | `next start` sobre el build real: HTML, manifest, `sw.js`, sincronización por HTTP real, idempotencia y 409 | Sin navegador; IndexedDB simulado |
+## Matriz de riesgo y pruebas
 
-Las pruebas de semanas 1–6 (`tests/*.spec.*`) se conservan y se ejecutan con `npm test`. Los nuevos archivos usan `node:test` ejecutado con `tsx`, sin dependencias nuevas.
+| Riesgo/comportamiento | Capa y prueba | Aserción principal |
+| --- | --- | --- |
+| Captura con esquema inválido o evidencia no permitida | Unitaria: `tests/unit/schema.test.ts`, `tests/unit/evidence.test.ts` | Acepta datos e imágenes válidos; rechaza campos inválidos, archivos no permitidos, vacíos o mayores de 5 MiB. |
+| Cola, reintento y duplicado local | Unitaria: `tests/unit/queue.test.ts`; integración: `tests/integration/offline-sync.test.ts` | Controla el reloj y el transporte; una inspección duplicada no vuelve a la cola y el fallo de red conserva el registro para reintento. |
+| Persistencia offline y reconexión | Integración: `tests/integration/offline-sync.test.ts`; navegador: `tests/e2e/ui-critical-flow.test.ts` | IndexedDB conserva el registro; la E2E guarda sin conexión, recarga desde la caché del Service Worker, reconecta y muestra una sola copia sincronizada. |
+| Idempotencia y conflictos del servidor | Integración: `tests/integration/sync-route.test.ts`; HTTP: `tests/e2e/application-contract.test.ts` | Repetir una clave devuelve el mismo resultado sin crear otra revisión; revisiones obsoletas producen `409`. |
+| Permiso de dispositivo denegado | Navegador: `tests/e2e/ui-critical-flow.test.ts`; adaptadores: `tests/capabilities.spec.ts` | Simula el rechazo de geolocalización y confirma que la captura sin ubicación se puede guardar y sincronizar. |
+| Rutas, manifest y Service Worker | HTTP: `tests/e2e/application-contract.test.ts`; navegador: `tests/e2e/ui-critical-flow.test.ts` | Verifica respuesta de rutas/manifest y controla el Service Worker real en Chromium para el caso offline. |
 
-### Cobertura E2E de contrato
+## Capas y decisiones
 
-`tests/e2e/application-contract.test.ts` usa el helper `tests/helpers/server.ts` para iniciar el build con `next start` en el puerto fijo 3109 (o el valor explícito de `E2E_PORT`). Comprueba por HTTP real la página principal, el listado de inspecciones, un detalle existente, el manifest instalable y el endpoint de sincronización. Para este último valida éxito, repetición idempotente, conflicto de revisión (`409`) y ausencia de clave idempotente (`400`). Todos los identificadores, textos y fechas de prueba son sintéticos.
+* **Unitarias:** `node:test` con `tsx`; se prueban reglas, respuestas y fallos con dependencias simuladas.
+* **Integración:** handler real de `/api/inspecciones/sync`, cola real e `IndexedDbSyncStore` con `fake-indexeddb`. Así se cubren transacciones y contratos sin depender de red externa.
+* **E2E HTTP:** `next start` sobre el build real comprueba rutas, manifest e idempotencia del endpoint.
+* **E2E de interfaz:** Playwright y Chromium conducen la pantalla real `/inspecciones`. El contexto controla la conectividad del navegador y simula el rechazo de geolocalización. El almacenamiento usado por la UI es IndexedDB nativo del navegador; el Service Worker se deja activo.
+* **Cobertura:** `c8` produce texto y `reports/coverage/lcov.info` para las suites unitarias y de integración. La cobertura sirve para identificar huecos; no se fija un umbral arbitrario ni se incluye cobertura de UI del navegador.
+* **Determinismo:** datos sintéticos aislados por caso; el reloj de la cola se inyecta para no esperar el backoff. Los servidores E2E usan puertos 3107–3110; `E2E_PORT` puede sustituir el puerto al ejecutar una suite aislada.
 
-## Decisiones y trade-offs
+El servidor HTTP E2E se inicia con `next start` sobre el build existente mediante `tests/helpers/server.ts`. La prueba de navegador abre Chromium headless desde Playwright y usa el mismo servidor compilado.
 
-* **E2E sin navegador (Playwright).** Un navegador agrega ~300 MB de descarga, es más lento y más frágil en CI. Se prueba el servidor real y la lógica del cliente por HTTP; el costo es que **no** se valida la UI renderizada, el registro real del Service Worker ni la cámara/geolocalización. Esas siguen cubiertas por las pruebas manuales de `README.md` (semana 6).
-* **Archivos explícitos en los scripts `test:*`.** Node 20 no expande globs en `--test`; listar archivos evita diferencias entre sistemas operativos.
-* **Reloj inyectado** (`now`) en `syncPending`: elimina esperas reales del backoff y hace las pruebas deterministas.
-* **Estado del servidor en memoria.** La ruta guarda revisiones en un `Map` por proceso; por eso cada prueba usa IDs y claves únicos, y el E2E arranca un proceso nuevo.
-* **Puertos del E2E.** Las suites usan 3107, 3108 y 3109 para evitar competir entre sí cuando el ejecutor las inicia en paralelo. `E2E_PORT` permite sustituir el puerto en una ejecución aislada.
+## Comandos reproducibles
 
-## Supuestos
-
-* Todos los datos son sintéticos (`synthetic-*`, `integration-*`, `e2e-*`, y las `inspection-00x` del repositorio).
-* Node.js 20+; puerto 3107 libre (configurable con `E2E_PORT`).
-* `npm run build` se ejecuta antes de `npm run test:e2e`.
-
-## Límites y fallos conocidos
-
-* No hay pruebas de UI en navegador ni de accesibilidad.
-* IndexedDB real de cada navegador (cuotas, modo privado, transacciones interrumpidas) no se prueba; se usa `fake-indexeddb`.
-* La idempotencia del servidor vive en memoria: se pierde al reiniciar, y no hay pruebas de concurrencia entre pestañas.
-* La ruta `/api/inspecciones/sync` no tiene autenticación (fuera del alcance académico).
-* Las pruebas de integración que usan `inspection-001` y `inspection-002` dependen de que los datos semilla no cambien (fecha 2026-08-28 / 2026-08-27, revisión 1).
-
-## Cómo reproducir
+Requisitos: Node.js 20 o superior, npm, GNU Make para ejecutar literalmente `make verify` y Chromium de Playwright para las E2E de interfaz.
 
 ```bash
 npm ci
+npm run lint
+npm run typecheck
 npm run build
-npm run test:all
-npm run verify
-```
-
-CI (`.github/workflows/academic-evaluation.yml`) ejecuta los mismos pasos en cada push y PR.
-
-## Resultados de ejecución — Semana 8
-
-Se ejecutaron las pruebas unitarias, las pruebas de integración y la verificación de la PWA para comprobar el funcionamiento de la validación de inspecciones, la cola de sincronización y el manejo de conflictos.
-
-### Pruebas unitarias
-
-**Comando ejecutado:**
-
-```bash
+npm test
 npm run test:unit
-```
-
-**Resultado:** PASS. Se aprobaron 19 de 19 pruebas, sin fallos.
-
-Estas pruebas comprobaron la resolución de conflictos según la fecha de actualización, el rechazo de fechas inválidas, la validación de imágenes permitidas y el funcionamiento de la cola y del transporte HTTP. También se verificó que las inspecciones cumplan con el esquema esperado.
-
-### Pruebas de integración
-
-**Comando ejecutado:**
-
-```bash
 npm run test:integration
+npm run test:coverage
+npx playwright install chromium
+npm run test:e2e
+make verify
 ```
 
-**Resultado:** PASS. Se aprobaron 10 de 10 pruebas, sin fallos.
+`npm run typecheck` comprueba la aplicación con el `tsconfig.json` del proyecto y tipa la nueva prueba de interfaz con las opciones ESM/browser de TypeScript.
 
-Se comprobó la integración entre IndexedDB, la cola de sincronización y la API. También se verificaron los reintentos después de un fallo de conexión, la prevención de duplicados mediante claves de idempotencia, las respuestas HTTP 400 y 409, y la actualización de revisiones.
+En Windows sin GNU Make, `npm run verify` ejecuta exactamente el target `verify` del `Makefile`. En CI, `npx playwright install --with-deps chromium` instala Chromium y sus dependencias del runner Linux.
 
-### Verificación de la PWA
+## Evidencia de defecto controlado
 
-**Comando ejecutado:**
+Se probó localmente una mutación temporal y se restauró inmediatamente:
 
-```bash
-npm run verify
+1. Se desactivó temporalmente la protección `if (existing.result)` en `src/lib/storage/schema.ts`.
+2. Se ejecutó `npm run test:integration`.
+3. El test [offline-sync.test.ts](../tests/integration/offline-sync.test.ts) — `IndexedDB + cola + API: captura offline y sincroniza al volver la conexión` — falló (9 pasaron, 1 falló) con `Error: Falló una transacción de IndexedDB.` al intentar insertar el mismo ID por segunda vez. Esto demuestra que la prueba detecta la regresión de duplicados.
+4. Se restauró la protección y `npm run test:all` volvió a ejecutar integración: 10/10 pruebas aprobadas.
+
+Salida resumida observada:
+
+```text
+Mutación: tests 10, pass 9, fail 1
+Error: Falló una transacción de IndexedDB.
+Restauración: tests 10, pass 10, fail 0
 ```
 
-**Resultado:** PASS. La verificación de la PWA terminó correctamente y se generó el reporte `reports/verification.json`.
+La mutación se hizo solo en el árbol local, no se integró ni publicó. El fallo es evidencia local; todavía no existe un enlace de Actions para la mutación. El workflow sube `reports/` incluso si falla una etapa, y la ejecución de recuperación del SHA final debe enlazarse al terminar la integración.
 
-### Conclusión
+## Límites y fallos conocidos
 
-Los resultados obtenidos indican que las pruebas unitarias y de integración ejecutadas pasaron correctamente y que la verificación de la PWA fue satisfactoria. Estas pruebas respaldan el funcionamiento de la validación de datos y de la sincronización de inspecciones, incluidos algunos escenarios de desconexión y resolución de conflictos.
-
-Los resultados no sustituyen las pruebas manuales en un navegador real, ni comprueban por sí solos el funcionamiento de la cámara, la geolocalización o el comportamiento de IndexedDB en todos los dispositivos.
+* El E2E de navegador prueba el flujo de la pantalla y el Service Worker en Chromium; no certifica todos los navegadores ni dispositivos.
+* La denegación de geolocalización se simula en la API del navegador; cámara, ubicación real y notificaciones no usan permisos ni datos físicos en CI.
+* IndexedDB se simula con `fake-indexeddb` en integración; el E2E sí usa IndexedDB de Chromium. No se cubren cuotas, modo privado ni fallos de transacción de todos los navegadores.
+* La copia remota del endpoint de demostración y su idempotencia viven en memoria y se pierden al reiniciar el proceso; no representan persistencia de producción.
+* La sincronización del endpoint no tiene autenticación y no debe exponerse como backend de producción.
+* `npm install` informó vulnerabilidades en dependencias (5 altas y 1 crítica) en este entorno. Deben revisarse antes de un despliegue; no se ejecutó `npm audit fix` porque podría introducir cambios ajenos al alcance.
