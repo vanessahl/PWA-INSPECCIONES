@@ -254,6 +254,21 @@
 
 - **Uso de IA:** Utilicé Claude.IA para ayudarme a preparar las pruebas, el workflow y la documentación. Después revisé el código y ejecuté los comandos para comprobar que las pruebas funcionaran correctamente.
 
+<<<<<<< HEAD
+## Semana 8 - Angel Gabriel Guzman Miguel
+
+- **Commit SHA evaluado:** [].
+
+- **Contribución:** Agregué `tests/e2e/application-contract.test.ts` para validar por HTTP el build real de la página principal, el listado de inspecciones, el detalle de una inspección, el manifest instalable y el endpoint de sincronización. Actualicé `test:e2e` para incorporar esta suite, ajusté el artefacto de CI para conservar todos los reportes y completé la documentación de estrategia y README.
+
+- **Decisión técnica:** Elegí E2E por contrato HTTP con `node:test` y `next start`, sin un navegador automatizado. El helper arranca la aplicación compilada en un puerto fijo y la prueba confirma contratos públicos importantes: HTML de rutas, manifest, idempotencia, conflicto `409` y validación `400` del endpoint.
+
+- **Pruebas ejecutadas y resultado:** Ejecuté `npm run build`, `npm run test:e2e` y `npm run verify`. La compilación terminó correctamente con Next.js 14.2.35. Las 13 pruebas E2E pasaron, incluyendo las cuatro pruebas nuevas de contrato. La verificación terminó con `Verificación de PWA: PASS` y generó `reports/verification.json`.
+
+- **Limitación:** Estas pruebas no controlan un navegador real: no validan interacción visual, registro efectivo del Service Worker, IndexedDB nativo, cámara, ubicación ni notificaciones. El endpoint de demostración conserva estado sólo en memoria durante la vida del proceso.
+
+- **Uso de IA:** Utilicé Codex/ChatGPT de OpenAI como apoyo para identificar contratos críticos, estructurar las pruebas y redactar la documentación. Revisé los cambios y validé personalmente los resultados de compilación, E2E y verificación.  
+=======
 
 
 ## Semana 8 - Vanessa Hernández López
@@ -269,3 +284,4 @@
 - **Limitación:** Las pruebas unitarias e integración no sustituyen las pruebas en un navegador real. Para la integración se utiliza `fake-indexeddb`, por lo que no se comprueba el comportamiento de IndexedDB real en todos los navegadores y dispositivos. Tampoco se validan con estas pruebas la cámara, la geolocalización ni la interfaz completa en un navegador.
 
 - **Uso de IA:** Utilicé ChatGPT como apoyo para revisar los resultados de las pruebas, corregir la configuración del script `test:unit` y organizar la documentación de mi participación. Después ejecuté los comandos en mi entorno local para comprobar los resultados.
+>>>>>>> origin/dev

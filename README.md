@@ -253,7 +253,7 @@ npm ci
 | --- | --- |
 | `npm run test:unit` | `tests/unit/`: política de conflictos, validación de esquema, cola y transporte HTTP |
 | `npm run test:integration` | `tests/integration/`: ruta `/api/inspecciones/sync` y cola + IndexedDB (`fake-indexeddb`) + API |
-| `npm run build` y `npm run test:e2e` | `tests/e2e/`: levanta `next start` en el puerto 3107 (`E2E_PORT` lo cambia) y prueba el flujo por HTTP real |
+| `npm run build` y `npm run test:e2e` | `tests/e2e/`: levanta `next start` en los puertos fijos 3107–3109 (`E2E_PORT` lo cambia en una ejecución aislada) y prueba por HTTP la página principal, inspecciones, detalle, manifest y sincronización |
 | `npm test` | Pruebas de semanas anteriores (se conservan) |
 | `npm run test:all` | Todo lo anterior en orden |
 | `make verify` | `npm run verify`: valida artefactos y genera `reports/verification.json` |
@@ -271,7 +271,7 @@ Si `make` no está disponible (Windows), `npm run verify` es el equivalente exac
 
 ### Evidencia
 
-* Workflow: `.github/workflows/academic-evaluation.yml` (corre en `push`, `pull_request` y manualmente; sube `reports/` como artefacto).
+* Workflow: `.github/workflows/academic-evaluation.yml` (corre en `push`, `pull_request` y manualmente; instala, compila, ejecuta todas las pruebas y sube `reports/` como artefacto).
 * Estrategia, decisiones, supuestos y límites: `docs/test-strategy.md`.
 * Evidencia individual: `evidence/individual.md`.
 * Todos los datos son sintéticos; no hay credenciales ni PII.
