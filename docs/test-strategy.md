@@ -14,12 +14,17 @@ Capturar una inspección sin conexión → guardarla en IndexedDB y en la outbox
 
 Las pruebas de semanas 1–6 (`tests/*.spec.*`) se conservan y se ejecutan con `npm test`. Los nuevos archivos usan `node:test` ejecutado con `tsx`, sin dependencias nuevas.
 
+### Cobertura E2E de contrato
+
+`tests/e2e/application-contract.test.ts` usa el helper `tests/helpers/server.ts` para iniciar el build con `next start` en el puerto fijo 3109 (o el valor explícito de `E2E_PORT`). Comprueba por HTTP real la página principal, el listado de inspecciones, un detalle existente, el manifest instalable y el endpoint de sincronización. Para este último valida éxito, repetición idempotente, conflicto de revisión (`409`) y ausencia de clave idempotente (`400`). Todos los identificadores, textos y fechas de prueba son sintéticos.
+
 ## Decisiones y trade-offs
 
 * **E2E sin navegador (Playwright).** Un navegador agrega ~300 MB de descarga, es más lento y más frágil en CI. Se prueba el servidor real y la lógica del cliente por HTTP; el costo es que **no** se valida la UI renderizada, el registro real del Service Worker ni la cámara/geolocalización. Esas siguen cubiertas por las pruebas manuales de `README.md` (semana 6).
 * **Archivos explícitos en los scripts `test:*`.** Node 20 no expande globs en `--test`; listar archivos evita diferencias entre sistemas operativos.
 * **Reloj inyectado** (`now`) en `syncPending`: elimina esperas reales del backoff y hace las pruebas deterministas.
 * **Estado del servidor en memoria.** La ruta guarda revisiones en un `Map` por proceso; por eso cada prueba usa IDs y claves únicos, y el E2E arranca un proceso nuevo.
+* **Puertos del E2E.** Las suites usan 3107, 3108 y 3109 para evitar competir entre sí cuando el ejecutor las inicia en paralelo. `E2E_PORT` permite sustituir el puerto en una ejecución aislada.
 
 ## Supuestos
 

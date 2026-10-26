@@ -41,4 +41,4 @@ jobs:
           name: academic-evidence-w08-tests
           if-no-files-found: ignore
           path: |
-            reports/verification.json
+            reports/
