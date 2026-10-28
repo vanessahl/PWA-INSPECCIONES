@@ -267,7 +267,7 @@ export default function InspectionsPage() {
             </label>
             <label>
               Hallazgos
-              <input required min="0" step="1" type="number" value={draft.findings}
+              <input required min="0" max="1000" step="1" type="number" value={draft.findings}
                 onChange={(event) => setDraft({ ...draft, findings: event.target.value })} />
             </label>
             <label className="form-wide">

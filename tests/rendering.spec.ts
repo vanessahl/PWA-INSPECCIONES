@@ -30,7 +30,7 @@ assert.match(listPage, /enqueueInspection\(store, record\)/);
 assert.match(listPage, /registerOnlineSync\(/);
 assert.match(listPage, /Pendiente de sincronizar/);
 assert.match(syncEndpoint, /idempotentResults\.get\(idempotencyKey\)/);
-assert.match(syncEndpoint, /status: 409/);
+assert.match(syncEndpoint, /jsonResponse\(\{ kind: "conflict", current \}, 409\)/);
 assert.doesNotMatch(detailPage, /"use client"/);
 assert.match(detailPage, /params: \{ id: string \}/);
 assert.match(detailPage, /inspections\.find\(/);

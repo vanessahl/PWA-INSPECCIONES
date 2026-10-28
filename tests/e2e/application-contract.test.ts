@@ -27,6 +27,19 @@ test("página principal: entrega el shell y la entrada a inspecciones", async ()
   assert.match(html, /manifest\.webmanifest/);
 });
 
+test("respuestas de producción aplican encabezados CSP, permisos y transporte", async () => {
+  const response = await fetch(`${base}/`);
+  assert.equal(response.status, 200);
+  const policy = response.headers.get("content-security-policy") ?? "";
+  assert.match(policy, /default-src 'self'/);
+  assert.match(policy, /frame-ancestors 'none'/);
+  assert.doesNotMatch(policy, /unsafe-eval/);
+  assert.equal(response.headers.get("strict-transport-security"), "max-age=31536000");
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.match(response.headers.get("permissions-policy") ?? "", /camera=\(self\)/);
+});
+
 test("inspecciones y detalle: responden las rutas esperadas", async () => {
   const list = await getHtml("/inspecciones");
   assert.match(list, /Cargando inspecciones/);
@@ -57,6 +70,7 @@ test("sincronización: valida, confirma idempotencia y reporta conflicto", async
 
   const firstResponse = await fetch(`${base}/api/inspecciones/sync`, { method: "POST", headers, body });
   assert.equal(firstResponse.status, 200);
+  assert.equal(firstResponse.headers.get("cache-control"), "no-store");
   const first = await firstResponse.json();
   assert.equal(first.kind, "synced");
   assert.equal(first.inspection.id, inspection.id);
