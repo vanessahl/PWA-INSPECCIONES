@@ -12,6 +12,8 @@ Durante la Semana 6 se agregaron capacidades opcionales de cámara, geolocalizac
 
 Durante la Semana 8 se agregaron pruebas unitarias, de integración y E2E del flujo crítico (captura offline → outbox → sincronización) y un workflow de CI. La estrategia, supuestos y límites están en `docs/test-strategy.md`.
 
+Durante la Semana 9 se agregaron un modelo de amenazas, un inventario de datos, encabezados de seguridad y validación estricta del endpoint de sincronización. Los límites y riesgos residuales están en `docs/threat-model.md` y `docs/privacy-data-inventory.md`.
+
 ## Requisitos
 
 * Node.js 20 o superior
@@ -115,6 +117,40 @@ La revisión local de este incremento pasó `npm ci`, lint, comprobación de tip
 ## Evidencia
 
 Para la entrega se debe conservar el commit correspondiente y, cuando aplique, el resultado de GitHub Actions.
+
+## Semana 9: seguridad y privacidad
+
+### Instalación y ejecución
+
+```bash
+npm ci
+npm run dev
+```
+
+La aplicación se abre en <http://localhost:3000>. Para una versión desplegada se requiere HTTPS; el endpoint y los datos de esta demostración no deben usarse en producción.
+
+### Verificación reproducible
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+npm run test:security
+npm test
+npm run verify
+```
+
+En Windows sin GNU Make, `npm run verify` es el equivalente exacto del target `make verify`. El workflow existente `.github/workflows/academic-evaluation.yml` ejecuta la validación en GitHub Actions cuando se publique una rama o se abra un Pull Request; todavía no se ha ejecutado para los cambios locales de Semana 9.
+
+### Evidencia y límites
+
+* Modelo de amenazas y controles: [`docs/threat-model.md`](docs/threat-model.md).
+* Datos, finalidades, almacenamiento y retención: [`docs/privacy-data-inventory.md`](docs/privacy-data-inventory.md).
+* Pruebas deterministas con datos sintéticos: `tests/security.spec.ts` (`npm run test:security`).
+* `public/robots.txt` solicita excluir `/api/` de rastreadores, pero no es un control de acceso.
+* El endpoint de demostración no tiene autenticación ni almacenamiento persistente. No introducir información personal, credenciales, ubicaciones o fotografías reales.
+
+Si el trabajo se realiza en equipo, consulten la [guía paso a paso para Vanne y Ángel](docs/week-09-team-guide.md). Cada integrante trabaja en su rama, documenta su evidencia individual y abre su propio Pull Request con base `dev`.
 
 Los resultados de verificación se generan en:
 

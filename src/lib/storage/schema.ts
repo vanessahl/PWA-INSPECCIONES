@@ -50,18 +50,39 @@ export interface SyncStore {
   adoptRemote(entryId: string, remote: VersionedInspection): Promise<void>;
 }
 
+const INSPECTION_FIELDS = new Set([
+  "id",
+  "location",
+  "date",
+  "inspector",
+  "status",
+  "statusLabel",
+  "findings",
+  "summary"
+]);
+
+function isBoundedText(value: unknown, maxLength: number): value is string {
+  return typeof value === "string" &&
+    value.trim().length > 0 &&
+    value.length <= maxLength &&
+    !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/.test(value);
+}
+
 export function isInspectionRecord(value: unknown): value is InspectionRecord {
   if (typeof value !== "object" || value === null) return false;
   const record = value as Record<string, unknown>;
+  const keys = Object.keys(record);
+  if (keys.length !== INSPECTION_FIELDS.size || keys.some((key) => !INSPECTION_FIELDS.has(key))) return false;
+
   return (
-    typeof record.id === "string" && record.id.trim().length > 0 &&
-    typeof record.location === "string" && record.location.trim().length > 0 &&
-    typeof record.date === "string" && !Number.isNaN(Date.parse(record.date)) &&
-    typeof record.inspector === "string" && record.inspector.trim().length > 0 &&
+    isBoundedText(record.id, 128) &&
+    isBoundedText(record.location, 100) &&
+    isBoundedText(record.date, 40) && !Number.isNaN(Date.parse(record.date)) &&
+    isBoundedText(record.inspector, 80) &&
     (record.status === "ok" || record.status === "attention") &&
-    typeof record.statusLabel === "string" && record.statusLabel.trim().length > 0 &&
-    Number.isInteger(record.findings) && (record.findings as number) >= 0 &&
-    typeof record.summary === "string" && record.summary.trim().length > 0
+    isBoundedText(record.statusLabel, 80) &&
+    Number.isSafeInteger(record.findings) && (record.findings as number) >= 0 && (record.findings as number) <= 1000 &&
+    isBoundedText(record.summary, 500)
   );
 }
 

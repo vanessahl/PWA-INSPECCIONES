@@ -46,6 +46,13 @@ const required = [
   "tests/integration/offline-sync.test.ts",
   "tests/e2e/critical-flow.test.ts",
   "docs/test-strategy.md",
+  "docs/threat-model.md",
+  "docs/privacy-data-inventory.md",
+  "src/lib/security/headers.mjs",
+  "src/lib/security/headers.d.mts",
+  "src/lib/security/request.ts",
+  "tests/security.spec.ts",
+  "public/robots.txt",
   ".github/workflows/academic-evaluation.yml"
 ];
 
@@ -95,6 +102,12 @@ const notifications = existsSync(resolve(root, "src/lib/notifications/client.ts"
 const capabilitiesTests = existsSync(resolve(root, "tests/capabilities.spec.ts"))
   ? readFileSync(resolve(root, "tests/capabilities.spec.ts"), "utf8")
   : "";
+const securityTests = existsSync(resolve(root, "tests/security.spec.ts"))
+  ? readFileSync(resolve(root, "tests/security.spec.ts"), "utf8")
+  : "";
+const nextConfig = existsSync(resolve(root, "next.config.mjs"))
+  ? readFileSync(resolve(root, "next.config.mjs"), "utf8")
+  : "";
 
 const checks = {
   serviceWorkerEvents: ["install", "activate", "fetch"].every((event) =>
@@ -118,13 +131,16 @@ const checks = {
     ),
   offlineCaptureForm: /handleSubmit/.test(inspectionPage) && /enqueueInspection/.test(inspectionPage),
   httpSyncEndpoint: /createHttpSyncTransport/.test(inspectionPage) &&
-    /idempotency-key/.test(syncEndpoint) && /status: 409/.test(syncEndpoint),
+    /idempotency-key/.test(syncEndpoint) && /jsonResponse\(\{ kind: "conflict", current \}, 409\)/.test(syncEndpoint),
   cameraCapability: /getUserMedia/.test(camera) && /validateEvidenceFile/.test(camera),
   geolocationCapability: /getCurrentPosition/.test(geolocation) && /permission-denied/.test(geolocation),
   notificationFallback: /requestNotificationPermission/.test(notifications) &&
     /mode: "fallback"/.test(notifications),
   capabilityTestsRegistered: /capabilities\.spec\.ts/.test(packageJson) &&
-    /fallback/.test(capabilitiesTests)
+    /fallback/.test(capabilitiesTests),
+  securityTestsRegistered: /test:security/.test(packageJson) &&
+    /validateSyncPayload/.test(securityTests),
+  securityHeadersConfigured: /getSecurityHeaders/.test(nextConfig)
 };
 const failedChecks = Object.entries(checks)
   .filter(([, passed]) => !passed)
