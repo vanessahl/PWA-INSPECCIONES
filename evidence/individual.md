@@ -278,4 +278,19 @@
 - **Decisión técnica:** Reutilicé el mismo módulo de encabezados en Next.js y en pruebas. La CSP de producción excluye `unsafe-eval`, aplica HSTS solo en producción y conserva `unsafe-inline`, requerido por la hidratación actual de Next.js. El endpoint rechaza cuerpos mayores de 16 KiB, campos inesperados, texto fuera de límites, controles y revisiones inválidas; no se añadieron credenciales porque el backend de demostración no consume servicios externos.
 - **Prueba ejecutada y resultado:** `npm ci --no-audit --no-fund` terminó correctamente. `npm run test:all` pasó lint, tipos, pruebas previas, 19 unitarias, 10 de integración, build, 29 casos de cobertura, 16 E2E y `npm run verify`. La suite nueva `npm run test:security` aprobó 5 pruebas, incluyendo la respuesta HTTP real con CSP, permisos y HSTS. `git diff --check` terminó sin errores.
 - **Limitaciones y fallos encontrados:** GitHub Actions todavía no se ha ejecutado para estos cambios. El endpoint sigue sin autenticación y usa memoria; IndexedDB no cifra ni elimina automáticamente sus datos, por lo que la app sigue siendo demostrativa y solo debe usarse con datos sintéticos. El escaneo de texto del kit reporta falsos positivos por una dependencia listada en el lockfile y una nota ya existente en `docs/capabilities.md`; no se cambiaron dependencias ni evidencia anterior para sortearlos. `npm ci` mostró avisos de paquetes obsoletos, sin impedir la instalación.
-- **Uso de IA:** Utilicé Copilot SDK en VS Code como apoyo para analizar el kit, proponer e implementar controles, redactar documentación y pruebas. L
+- **Uso de IA:** Utilicé Copilot SDK en VS Code como apoyo para analizar el kit, proponer e implementar controles, redactar documentación y pruebas. 
+
+
+# Semana 9 - Vanessa Hernández López
+
+- **Commit de implementación:** `60218c57a7625ba9c28cebdda64aba2d4f1a81ec`
+
+- **Qué hice:** Implementé la eliminación local de inspecciones y de sus tareas pendientes de sincronización. Modifiqué `src/lib/storage/schema.ts` para agregar el método `deleteLocal`, que elimina ambos registros dentro de una misma transacción. También agregué una opción para eliminar inspecciones desde la pantalla principal, con un mensaje de confirmación y la posibilidad de cancelar. Actualicé el inventario de privacidad y agregué pruebas en `tests/privacy-retention.spec.ts`.
+
+- **Decisión técnica:** Realicé la eliminación de la inspección y su tarea pendiente de sincronización en una sola transacción de IndexedDB, para evitar que quede información relacionada sin eliminar. La eliminación se limita al dispositivo y no elimina una copia que ya se haya sincronizado con el servidor. También se conserva la información de las demás inspecciones.
+
+- **Prueba ejecutada y resultado:** Las tres pruebas nuevas de `tests/privacy-retention.spec.ts` pasaron correctamente. Se comprobó que se elimine la inspección junto con su tarea pendiente, que las demás inspecciones se conserven y que eliminar un registro inexistente no afecte otros registros. También probé manualmente la confirmación y cancelación desde la interfaz. `npm run lint`, `npm run typecheck`, `npm test` y `npm run verify` terminaron correctamente. Finalmente, `git diff --check` no reportó errores.
+
+- **Limitaciones y fallos encontrados:** La eliminación realizada desde la aplicación solo afecta los datos almacenados localmente en el dispositivo. Si una inspección ya fue sincronizada, su copia en el servidor no se elimina. IndexedDB tampoco cifra automáticamente la información almacenada. Por eso, la aplicación sigue siendo demostrativa y se deben utilizar datos sintéticos.
+
+- **Uso de IA:** Utilicé ChatGPT como apoyo para comprender los cambios necesarios, revisar el código, preparar las pruebas y redactar la documentación. Revisé y ejecuté los cambios en mi proyecto, comprobando los resultados de las pruebas antes de realizar el commit.

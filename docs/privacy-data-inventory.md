@@ -31,3 +31,24 @@ No existe una función de borrado ni un plazo de expiración para IndexedDB. Los
 ## No recolectar
 
 No registrar nombres reales, matrículas, teléfonos, correos, credenciales, fotografías reales, coordenadas personales, datos de salud, contraseñas ni información que identifique a estudiantes, personal o instalaciones sensibles. No subir esos datos a issues, CI, capturas, commits o archivos de prueba. Las imágenes y ubicaciones automatizadas deben ser sintéticas.
+
+## Eliminación de datos locales
+
+La aplicación permite eliminar una inspección que se encuentre almacenada en el dispositivo. Para realizar esta operación, el usuario selecciona la opción **Eliminar inspección** y aparece un mensaje de confirmación con la posibilidad de aceptar o cancelar.
+
+Cuando se confirma la eliminación, se ejecuta una transacción de escritura en IndexedDB que elimina:
+
+- El registro de la inspección del almacén `inspections`.
+- La tarea pendiente relacionada con esa inspección del almacén `outbox`.
+
+Ambas operaciones se realizan dentro de la misma transacción para evitar que quede información incompleta. Las demás inspecciones y sus tareas de sincronización se conservan.
+
+Si el usuario cancela la operación, no se elimina ningún dato y la inspección permanece almacenada en el dispositivo. La interfaz muestra un mensaje indicando si la eliminación se realizó correctamente o si ocurrió algún error.
+
+**Importante:** esta función elimina únicamente los datos del almacenamiento local. Si una inspección ya fue sincronizada, eliminarla del dispositivo no significa que también se elimine del servidor. Para borrar información remota se necesitaría un procedimiento independiente autorizado.
+
+## Consideraciones de privacidad
+
+Para comprobar la eliminación se utilizan identificadores, responsables, ubicaciones y observaciones ficticias. No se deben utilizar datos personales reales durante las pruebas.
+
+La eliminación local ayuda a mantener un mejor control de la información almacenada en el dispositivo, pero no sustituye una política completa de conservación y eliminación de datos en el servidor.
