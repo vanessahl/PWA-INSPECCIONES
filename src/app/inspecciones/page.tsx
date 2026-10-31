@@ -33,6 +33,7 @@ export default function InspectionsPage() {
   const [localRecords, setLocalRecords] = useState<StoredInspection[]>([]);
   const [syncNotice, setSyncNotice] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [online, setOnline] = useState(false);
   const [evidenceName, setEvidenceName] = useState("");
   const [locationCapture, setLocationCapture] = useState<SyntheticLocation | null>(null);
@@ -151,6 +152,34 @@ export default function InspectionsPage() {
     }
   };
 
+  const handleDeleteInspection = async (inspectionId: string) => {
+    const confirmed = window.confirm(
+      "¿Estás segura de que deseas eliminar esta inspección del almacenamiento local? Esta acción no elimina los datos del servidor si ya fueron sincronizados."
+    );
+
+    if (!confirmed) {
+      setSyncNotice("Se canceló la eliminación. La inspección se conservó.");
+      return;
+    }
+
+    setDeletingId(inspectionId);
+    setSyncNotice("");
+
+    try {
+      const store = createSyncStore();
+      await store.deleteLocal(inspectionId);
+
+      const updatedRecords = await store.listLocal();
+      setLocalRecords(updatedRecords);
+
+      setSyncNotice("La inspección y su tarea pendiente de sincronización se eliminaron correctamente del dispositivo.");
+    } catch {
+      setSyncNotice("No se pudo eliminar la inspección del almacenamiento local. Inténtalo nuevamente.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const handleEvidenceChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -211,11 +240,11 @@ export default function InspectionsPage() {
 
   const records = state.status === "ready"
     ? [
-        ...state.records,
-        ...localRecords
-          .filter(({ inspection }) => !state.records.some((record) => record.id === inspection.id))
-          .map(({ inspection }) => inspection)
-      ]
+      ...state.records,
+      ...localRecords
+        .filter(({ inspection }) => !state.records.some((record) => record.id === inspection.id))
+        .map(({ inspection }) => inspection)
+    ]
     : [];
 
   return (
@@ -330,30 +359,40 @@ export default function InspectionsPage() {
               {records.map((inspection) => {
                 const localRecord = localRecords.find((record) => record.inspection.id === inspection.id);
                 return (
-                <article className="inspection-card" key={inspection.id}>
-                  <div className="card-topline">
-                    <span className={`badge badge-${inspection.status}`}>
-                      {inspection.statusLabel}
-                    </span>
-                    <time className="muted" dateTime={inspection.date}>
-                      {inspection.date}
-                    </time>
-                  </div>
-                  {localRecord && (
-                    <p className={localRecord.syncStatus === "pending" ? "sync-pending" : "sync-complete"}>
-                      {localRecord.syncStatus === "pending" ? "Pendiente de sincronizar" : "Sincronizada"}
-                    </p>
-                  )}
-                  <h2>{inspection.location}</h2>
-                  <p>{inspection.summary}</p>
-                  <dl>
-                    <div><dt>Responsable</dt><dd>{inspection.inspector}</dd></div>
-                    <div><dt>Hallazgos</dt><dd>{inspection.findings}</dd></div>
-                  </dl>
-                  <Link className="text-link" href={`/inspecciones/${inspection.id}`}>
-                    Ver detalle
-                  </Link>
-                </article>
+                  <article className="inspection-card" key={inspection.id}>
+                    <div className="card-topline">
+                      <span className={`badge badge-${inspection.status}`}>
+                        {inspection.statusLabel}
+                      </span>
+                      <time className="muted" dateTime={inspection.date}>
+                        {inspection.date}
+                      </time>
+                    </div>
+                    {localRecord && (
+                      <p className={localRecord.syncStatus === "pending" ? "sync-pending" : "sync-complete"}>
+                        {localRecord.syncStatus === "pending" ? "Pendiente de sincronizar" : "Sincronizada"}
+                      </p>
+                    )}
+                    <h2>{inspection.location}</h2>
+                    <p>{inspection.summary}</p>
+                    <dl>
+                      <div><dt>Responsable</dt><dd>{inspection.inspector}</dd></div>
+                      <div><dt>Hallazgos</dt><dd>{inspection.findings}</dd></div>
+                    </dl>
+                    <Link className="text-link" href={`/inspecciones/${inspection.id}`}>
+                      Ver detalle
+                    </Link>
+                    {localRecord && (
+                      <button
+                        className="button-link button-secondary"
+                        type="button"
+                        disabled={deletingId === inspection.id}
+                        onClick={() => void handleDeleteInspection(inspection.id)}
+                      >
+                        {deletingId === inspection.id ? "Eliminando…" : "Eliminar inspección"}
+                      </button>
+                    )}
+                  </article>
                 );
               })}
             </div>

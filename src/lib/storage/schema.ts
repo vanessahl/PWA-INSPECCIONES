@@ -44,6 +44,7 @@ export interface SyncStore {
   enqueueLocal(inspection: InspectionRecord, updatedAt: string, idempotencyKey: string): Promise<boolean>;
   listLocal(): Promise<StoredInspection[]>;
   listPending(): Promise<OutboxEntry[]>;
+  deleteLocal(inspectionId: string): Promise<void>;
   claimDue(now: number, leaseMs: number): Promise<OutboxEntry[]>;
   defer(entry: OutboxEntry): Promise<void>;
   markSynced(entry: OutboxEntry, remote: VersionedInspection): Promise<void>;
@@ -173,6 +174,17 @@ export class IndexedDbSyncStore implements SyncStore {
       const request = tx.objectStore(OUTBOX_STORE).getAll();
       request.onsuccess = () => setResult(request.result as OutboxEntry[]);
     });
+  }
+  deleteLocal(inspectionId: string) {
+    return transaction<void>(
+      [INSPECTIONS_STORE, OUTBOX_STORE],
+      "readwrite",
+    (tx, setResult) => {
+        tx.objectStore(INSPECTIONS_STORE).delete(inspectionId);
+        tx.objectStore(OUTBOX_STORE).delete(inspectionId);
+        setResult(undefined);
+      }
+    );
   }
 
   claimDue(now: number, leaseMs: number) {
