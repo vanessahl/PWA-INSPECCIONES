@@ -35,3 +35,11 @@ Las pruebas reproducibles están en [`tests/security.spec.ts`](../tests/security
 Antes de producción hacen falta autenticación y autorización, limitación de frecuencia, almacenamiento remoto persistente, política de retención y borrado, revisión legal/institucional, análisis de dependencias, TLS en la plataforma y una CSP con nonce que se haya validado con el Service Worker. La restricción de robots no sustituye ninguno de esos controles.
 
 El escaneo de texto del `public-tests/check.sh` incluido en el kit marca coincidencias falsas por una dependencia listada en el lockfile y una nota previa de `docs/capabilities.md`, porque busca subcadenas sin distinguir dependencias o documentación. No se alteraron esos archivos ajenos a esta actividad para ocultar el falso positivo; el resultado de `npm run verify` y las pruebas funcionales se reporta por separado.
+
+## Verificación de Semana 9
+
+Las pruebas de seguridad comprueban cabeceras HTTP, `robots.txt`, JSON malformado, solicitudes sin clave idempotente y cuerpos mayores de 16 KiB. La prueba E2E valida esos contratos contra `next start`.
+
+`robots.txt` solicita a rastreadores cooperativos evitar `/api/`; no autentica usuarios, no restringe rutas y no sustituye controles de acceso.
+
+El workflow `week-09-w09-security-privacy.yml` usa Node.js 20, permiso mínimo `contents: read`, instalación reproducible, lint, tipos, compilación y pruebas. Si falla algún paso, conserva los reportes disponibles como artefacto.

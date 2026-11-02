@@ -11,7 +11,9 @@ before(async () => {
   base = server.base;
 });
 
-after(() => { server?.stop(); });
+after(() => {
+  server?.stop();
+});
 
 async function getHtml(path: string): Promise<string> {
   const response = await fetch(`${base}${path}`);
@@ -30,6 +32,7 @@ test("página principal: entrega el shell y la entrada a inspecciones", async ()
 test("respuestas de producción aplican encabezados CSP, permisos y transporte", async () => {
   const response = await fetch(`${base}/`);
   assert.equal(response.status, 200);
+
   const policy = response.headers.get("content-security-policy") ?? "";
   assert.match(policy, /default-src 'self'/);
   assert.match(policy, /frame-ancestors 'none'/);
@@ -52,40 +55,121 @@ test("inspecciones y detalle: responden las rutas esperadas", async () => {
 test("manifest: conserva el contrato instalable", async () => {
   const response = await fetch(`${base}/manifest.webmanifest`);
   assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /application\/manifest\+json|application\/json/);
+  assert.match(
+    response.headers.get("content-type") ?? "",
+    /application\/manifest\+json|application\/json/
+  );
+
   const manifest = await response.json();
   assert.equal(manifest.start_url, "/");
   assert.equal(manifest.display, "standalone");
   assert.ok(Array.isArray(manifest.icons) && manifest.icons.length >= 2);
 });
 
+test("robots.txt limita rastreadores cooperativos, sin proteger la API", async () => {
+  const robots = await fetch(`${base}/robots.txt`);
+  assert.equal(robots.status, 200);
+  assert.match(robots.headers.get("content-type") ?? "", /text\/plain/);
+
+  const text = await robots.text();
+  assert.match(text, /User-agent: \*/);
+  assert.match(text, /Disallow: \/api\//);
+
+  const endpoint = await fetch(`${base}/api/inspecciones/sync`);
+  assert.notEqual(endpoint.status, 404, "robots.txt no reemplaza el control del endpoint");
+});
+
 test("sincronización: valida, confirma idempotencia y reporta conflicto", async () => {
   const inspection = syntheticInspection({ id: "e2e-contract-001" });
+
   const body = JSON.stringify({
     inspection,
     updatedAt: "2026-10-25T10:00:00.000Z",
     expectedRevision: null
   });
-  const headers = { "content-type": "application/json", "idempotency-key": "e2e-contract-key-001" };
 
-  const firstResponse = await fetch(`${base}/api/inspecciones/sync`, { method: "POST", headers, body });
+  const headers = {
+    "content-type": "application/json",
+    "idempotency-key": "e2e-contract-key-001"
+  };
+
+  const firstResponse = await fetch(`${base}/api/inspecciones/sync`, {
+    method: "POST",
+    headers,
+    body
+  });
+
   assert.equal(firstResponse.status, 200);
   assert.equal(firstResponse.headers.get("cache-control"), "no-store");
+
   const first = await firstResponse.json();
   assert.equal(first.kind, "synced");
   assert.equal(first.inspection.id, inspection.id);
 
-  const replayResponse = await fetch(`${base}/api/inspecciones/sync`, { method: "POST", headers, body });
-  assert.deepEqual(await replayResponse.json(), first, "la misma clave devuelve el resultado original");
+  const replayResponse = await fetch(`${base}/api/inspecciones/sync`, {
+    method: "POST",
+    headers,
+    body
+  });
+
+  assert.deepEqual(
+    await replayResponse.json(),
+    first,
+    "la misma clave devuelve el resultado original"
+  );
 
   const conflictResponse = await fetch(`${base}/api/inspecciones/sync`, {
     method: "POST",
-    headers: { "content-type": "application/json", "idempotency-key": "e2e-contract-key-002" },
-    body: JSON.stringify({ ...JSON.parse(body), expectedRevision: 0 })
+    headers: {
+      "content-type": "application/json",
+      "idempotency-key": "e2e-contract-key-002"
+    },
+    body: JSON.stringify({
+      ...JSON.parse(body),
+      expectedRevision: 0
+    })
   });
+
   assert.equal(conflictResponse.status, 409);
   assert.equal((await conflictResponse.json()).current.revision, 1);
 
-  const invalidResponse = await fetch(`${base}/api/inspecciones/sync`, { method: "POST", body });
+  const invalidResponse = await fetch(`${base}/api/inspecciones/sync`, {
+    method: "POST",
+    body
+  });
+
   assert.equal(invalidResponse.status, 400, "la clave idempotente es obligatoria");
+
+  const malformedResponse = await fetch(`${base}/api/inspecciones/sync`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "idempotency-key": "e2e-contract-malformed"
+    },
+    body: "{json inválido"
+  });
+
+  assert.equal(malformedResponse.status, 400, "el endpoint rechaza JSON malformado");
+
+  const oversizedResponse = await fetch(`${base}/api/inspecciones/sync`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "idempotency-key": "e2e-contract-oversized"
+    },
+    body: JSON.stringify({
+      inspection: syntheticInspection({
+        id: "e2e-contract-oversized",
+        summary: "x".repeat(17 * 1024)
+      }),
+      updatedAt: "2026-10-25T10:00:00.000Z",
+      expectedRevision: null
+    })
+  });
+
+  assert.equal(
+    oversizedResponse.status,
+    413,
+    "el endpoint rechaza cuerpos mayores a 16 KiB"
+  );
 });

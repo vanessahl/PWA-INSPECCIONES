@@ -294,3 +294,12 @@
 - **Limitaciones y fallos encontrados:** La eliminación realizada desde la aplicación solo afecta los datos almacenados localmente en el dispositivo. Si una inspección ya fue sincronizada, su copia en el servidor no se elimina. IndexedDB tampoco cifra automáticamente la información almacenada. Por eso, la aplicación sigue siendo demostrativa y se deben utilizar datos sintéticos.
 
 - **Uso de IA:** Utilicé ChatGPT como apoyo para comprender los cambios necesarios, revisar el código, preparar las pruebas y redactar la documentación. Revisé y ejecuté los cambios en mi proyecto, comprobando los resultados de las pruebas antes de realizar el commit.
+
+# Semana 9 - Ángel Gabriel Guzman Miguel
+
+- **Commit de implementación:** [PEGA AQUÍ EL SHA].
+- **Qué hice:** Agregué el workflow de CI de Semana 9 y amplié las pruebas E2E y de seguridad para validar cabeceras HTTP, `robots.txt`, JSON malformado, solicitudes sin clave idempotente y cuerpos mayores de 16 KiB.
+- **Decisión técnica:** `robots.txt` se valida como una instrucción para rastreadores, no como control de acceso. La protección real está en las cabeceras, validación del endpoint, clave idempotente obligatoria y límite de tamaño.
+- **Pruebas ejecutadas y resultado:** Ejecuté `npx playwright install chromium`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:security`, `npm run test:e2e`, `npm test`, `npm run verify` y `git diff --check`. [ESCRIBE AQUÍ LOS RESULTADOS REALES].
+- **Limitaciones:** `robots.txt` no protege la API. El endpoint de demostración no tiene autenticación y conserva datos sólo en memoria; no debe usarse con información real.
+- **Uso de IA:** Utilicé Codex/ChatGPT como apoyo para identificar casos de seguridad, estructurar las pruebas y redactar documentación. Revisé los cambios y validé los resultados reales antes de hacer commit.
