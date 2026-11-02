@@ -24,10 +24,11 @@ export async function notifyInspectionChange(
 
   try {
     const permission = await requestNotificationPermission();
-    if (permission !== "granted") {
-      // "denied" o "default" (diálogo descartado): no se muestra nada nativo y se usa la alternativa.
+    if (permission === "unsupported" || permission === "denied") {
       fallback();
-      return { ok: true, mode: "fallback" };
+      return permission === "denied"
+        ? { ok: true, mode: "fallback" }
+        : { ok: false, reason: "unsupported" };
     }
     new Notification(title, options);
     return { ok: true, mode: "notification" };
