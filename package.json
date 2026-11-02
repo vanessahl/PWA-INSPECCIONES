@@ -10,7 +10,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "test": "node tests/starter.spec.mjs && tsx tests/manifest.spec.ts && tsx tests/service-worker.spec.ts && tsx tests/offline.spec.ts && tsx tests/rendering.spec.ts && tsx tests/sync.spec.ts && tsx tests/capabilities.spec.ts",
+    "test:security": "tsx tests/security.spec.ts",
+    "test:e2e": "tsx tests/e2e/application-contract.test.ts",
     "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
