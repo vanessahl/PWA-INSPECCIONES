@@ -1,0 +1,39 @@
+name: Week 09 Security and Privacy
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-and-privacy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install chromium
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run test:security
+      - run: npm run test:e2e
+      - run: npm test
+      - run: npm run verify
+      - name: Upload reports when a check fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: week-09-security-privacy-reports
+          if-no-files-found: ignore
+          path: |
+            reports/
+            test-results/
+            coverage/

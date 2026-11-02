@@ -51,17 +51,52 @@ export interface SyncStore {
 }
 
 export function isInspectionRecord(value: unknown): value is InspectionRecord {
-  if (typeof value !== "object" || value === null) return false;
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
+  const keys = Object.keys(record);
+  const expectedKeys = [
+    "id",
+    "location",
+    "date",
+    "inspector",
+    "status",
+    "statusLabel",
+    "findings",
+    "summary"
+  ];
+
+  if (!keys.length || keys.length !== expectedKeys.length || !expectedKeys.every((key) => keys.includes(key))) {
+    return false;
+  }
+
   return (
-    typeof record.id === "string" && record.id.trim().length > 0 &&
-    typeof record.location === "string" && record.location.trim().length > 0 &&
-    typeof record.date === "string" && !Number.isNaN(Date.parse(record.date)) &&
-    typeof record.inspector === "string" && record.inspector.trim().length > 0 &&
+    typeof record.id === "string" &&
+    record.id.length > 0 &&
+    record.id.length <= 128 &&
+    !/\u0000/.test(record.id) &&
+    typeof record.location === "string" &&
+    record.location.length > 0 &&
+    record.location.length <= 100 &&
+    !/\u0000/.test(record.location) &&
+    typeof record.date === "string" &&
+    record.date.length > 0 &&
+    !Number.isNaN(Date.parse(record.date)) &&
+    typeof record.inspector === "string" &&
+    record.inspector.length > 0 &&
+    record.inspector.length <= 80 &&
+    !/\u0000/.test(record.inspector) &&
     (record.status === "ok" || record.status === "attention") &&
-    typeof record.statusLabel === "string" && record.statusLabel.trim().length > 0 &&
-    Number.isInteger(record.findings) && (record.findings as number) >= 0 &&
-    typeof record.summary === "string" && record.summary.trim().length > 0
+    typeof record.statusLabel === "string" &&
+    record.statusLabel.length > 0 &&
+    record.statusLabel.length <= 80 &&
+    !/\u0000/.test(record.statusLabel) &&
+    Number.isInteger(record.findings) &&
+    (record.findings as number) >= 0 &&
+    (record.findings as number) <= 1000 &&
+    typeof record.summary === "string" &&
+    record.summary.length > 0 &&
+    record.summary.length <= 500 &&
+    !/\u0000/.test(record.summary)
   );
 }
 
