@@ -106,13 +106,33 @@ Las pruebas de renderizado y sincronización forman parte de `npm test`; cubren 
 
 La prueba de capacidades forma parte de `npm test` y cubre la ausencia de APIs del navegador, el rechazo de permisos, la validación de evidencia de imagen y el fallback de notificaciones. Las APIs de cámara, geolocalización y notificaciones solo se solicitan desde una acción explícita del usuario.
 
-En esta revisión se ejecutaron `npm ci`, `npm test`, `npm run build` y `npm run verify`; todos terminaron correctamente. `npm ci` informó dos vulnerabilidades en dependencias (una alta y una crítica). Este entorno no tiene GNU Make ni GitHub CLI, y no fue posible despachar un workflow de Actions desde las herramientas disponibles; por eso el estado de Actions debe verificarse en GitHub cuando se publique el commit. `npm run verify` es el equivalente local exacto de `make verify`.
+`npm run verify` es el equivalente local exacto de `make verify`: el target `verify` del `Makefile` ejecuta únicamente `npm run verify`. En Windows sin GNU Make se puede usar directamente ese comando.
+
+## Seguridad y privacidad — Semana 9
+
+La implementación y los límites se documentan en [`docs/threat-model.md`](docs/threat-model.md) y el inventario de datos en [`docs/privacy-data-inventory.md`](docs/privacy-data-inventory.md). Se usan datos sintéticos; no ingresar información personal ni secretos.
+
+Las pruebas específicas se pueden ejecutar después de `npm ci`:
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+npm run test:security
+npm run test:e2e
+npm test
+npm run verify
+```
+
+GitHub Actions ejecuta esos gates en [`.github/workflows/week-09-w09-security-privacy.yml`](.github/workflows/week-09-w09-security-privacy.yml). La ejecución del PR #14 terminó correctamente en [Week 09 Security and Privacy](https://github.com/vanessahl/PWA-INSPECCIONES/actions/runs/41400724325). El workflow instala Chromium para sus pruebas y conserva reportes como artefactos si falla un paso. La instalación local `npm ci` reportó dependencias con avisos de vulnerabilidad; revisar `npm audit` antes de actualizar versiones y no asumir que la aplicación de demostración está lista para producción.
+
+La evidencia individual, incluyendo el commit evaluado, las pruebas, las limitaciones y el uso de IA, está en [`evidence/individual.md`](evidence/individual.md).
 
 Para la Semana 6, GitHub Actions usa `.github/workflows/week-06-w06-device-push.yml`. El flujo instala con `npm ci --ignore-scripts --no-audit --no-fund`, ejecuta el build y valida los artefactos obligatorios. En Windows sin GNU Make, `npm run verify` sigue siendo el equivalente exacto de `make verify`.
 
 ## Evidencia
 
-Para la entrega se debe conservar el commit correspondiente y, cuando aplique, el resultado de GitHub Actions.
+Para la entrega se debe conservar el commit correspondiente y el resultado de GitHub Actions. La evidencia individual y las decisiones técnicas se registran en [`evidence/individual.md`](evidence/individual.md); los riesgos de datos, controles y límites se detallan en [`docs/privacy-data-inventory.md`](docs/privacy-data-inventory.md) y [`docs/threat-model.md`](docs/threat-model.md).
 
 Los resultados de verificación se generan en:
 

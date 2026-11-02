@@ -6,10 +6,10 @@ const nextConfig = {
   async headers() {
     return [{
       source: "/:path*",
-      headers: getSecurityHeaders(true).map(({ key, value }) => ({ key, value }))
+      headers: getSecurityHeaders(process.env.NODE_ENV === "production")
+        .map(({ key, value }) => ({ key, value }))
     }];
   }
 };
 
 export default nextConfig;
-

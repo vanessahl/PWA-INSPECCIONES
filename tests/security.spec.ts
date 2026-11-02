@@ -124,6 +124,14 @@ test("valida estrictamente el contrato de sincronización y limita textos y revi
   assert.equal(
     validateSyncPayload({
       ...payload,
+      inspection: syntheticInspection({ location: "Laboratorio\u0085Prueba" })
+    }),
+    null
+  );
+
+  assert.equal(
+    validateSyncPayload({
+      ...payload,
       inspection: syntheticInspection({ findings: 1001 })
     }),
     null

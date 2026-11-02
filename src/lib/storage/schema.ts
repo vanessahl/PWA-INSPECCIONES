@@ -50,6 +50,10 @@ export interface SyncStore {
   adoptRemote(entryId: string, remote: VersionedInspection): Promise<void>;
 }
 
+function hasNoControlCharacters(value: string): boolean {
+  return !/[\u0000-\u001F\u007F-\u009F]/.test(value);
+}
+
 export function isInspectionRecord(value: unknown): value is InspectionRecord {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
@@ -73,30 +77,31 @@ export function isInspectionRecord(value: unknown): value is InspectionRecord {
     typeof record.id === "string" &&
     record.id.length > 0 &&
     record.id.length <= 128 &&
-    !/\u0000/.test(record.id) &&
+    hasNoControlCharacters(record.id) &&
     typeof record.location === "string" &&
     record.location.length > 0 &&
     record.location.length <= 100 &&
-    !/\u0000/.test(record.location) &&
+    hasNoControlCharacters(record.location) &&
     typeof record.date === "string" &&
     record.date.length > 0 &&
+    hasNoControlCharacters(record.date) &&
     !Number.isNaN(Date.parse(record.date)) &&
     typeof record.inspector === "string" &&
     record.inspector.length > 0 &&
     record.inspector.length <= 80 &&
-    !/\u0000/.test(record.inspector) &&
+    hasNoControlCharacters(record.inspector) &&
     (record.status === "ok" || record.status === "attention") &&
     typeof record.statusLabel === "string" &&
     record.statusLabel.length > 0 &&
     record.statusLabel.length <= 80 &&
-    !/\u0000/.test(record.statusLabel) &&
+    hasNoControlCharacters(record.statusLabel) &&
     Number.isInteger(record.findings) &&
     (record.findings as number) >= 0 &&
     (record.findings as number) <= 1000 &&
     typeof record.summary === "string" &&
     record.summary.length > 0 &&
     record.summary.length <= 500 &&
-    !/\u0000/.test(record.summary)
+    hasNoControlCharacters(record.summary)
   );
 }
 

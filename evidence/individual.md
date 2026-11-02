@@ -297,9 +297,10 @@
 
 # Semana 9 - Ángel Gabriel Guzman Miguel
 
-- **Commit de implementación:** [PEGA AQUÍ EL SHA].
-- **Qué hice:** Agregué el workflow de CI de Semana 9 y amplié las pruebas E2E y de seguridad para validar cabeceras HTTP, `robots.txt`, JSON malformado, solicitudes sin clave idempotente y cuerpos mayores de 16 KiB.
-- **Decisión técnica:** `robots.txt` se valida como una instrucción para rastreadores, no como control de acceso. La protección real está en las cabeceras, validación del endpoint, clave idempotente obligatoria y límite de tamaño.
-- **Pruebas ejecutadas y resultado:** Ejecuté `npx playwright install chromium`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:security`, `npm run test:e2e`, `npm test`, `npm run verify` y `git diff --check`. [ESCRIBE AQUÍ LOS RESULTADOS REALES].
-- **Limitaciones:** `robots.txt` no protege la API. El endpoint de demostración no tiene autenticación y conserva datos sólo en memoria; no debe usarse con información real.
-- **Uso de IA:** Utilicé Codex/ChatGPT como apoyo para identificar casos de seguridad, estructurar las pruebas y redactar documentación. Revisé los cambios y validé los resultados reales antes de hacer commit.
+- **Commit de implementación evaluado:** `6b06d14225b295284b61f993149b8ca591219e3a`.
+- **Qué hice:** Agregué el workflow de CI de Semana 9, amplié las pruebas E2E y de seguridad y documenté el modelo de amenazas. Las pruebas comprueban cabeceras HTTP, `robots.txt`, JSON malformado, clave idempotente, esquema estricto y límite de tamaño del endpoint.
+- **Decisión técnica:** Se usa un parser acotado a 16 KiB, validación estricta del contrato, clave idempotente y cabeceras CSP, HSTS y Permissions-Policy. `robots.txt` solo orienta a rastreadores cooperativos y no es un control de acceso. Se usa exclusivamente información sintética.
+- **Pruebas ejecutadas y resultado:** En local ejecuté `npm ci`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm run test:security`, `npm run test:e2e`, `npm test` y `npm run verify`; terminaron correctamente. GitHub Actions también pasó el workflow [Week 09 Security and Privacy](https://github.com/vanessahl/PWA-INSPECCIONES/actions/runs/41400724325) en el commit evaluado; el workflow instala Chromium y ejecuta los mismos gates.
+- **Fallo y corrección:** La primera ejecución del workflow falló porque `package.json` no tenía los scripts `lint`, `typecheck`, `test:security` y `test:e2e` que el workflow invocaba. Agregué esos scripts y la ejecución posterior terminó correctamente.
+- **Limitaciones:** El endpoint de demostración no tiene autenticación ni autorización y guarda datos remotos solo en memoria. IndexedDB no cifra los datos y la interfaz no ofrece eliminación local. No usar información real ni considerar el sistema listo para producción.
+- **Uso de IA:** Utilicé Copilot SDK en VS Code como apoyo para analizar los requisitos, implementar y revisar las validaciones, estructurar pruebas y redactar documentación. Revisé personalmente el código y comprobé los resultados de las pruebas locales y de GitHub Actions.
