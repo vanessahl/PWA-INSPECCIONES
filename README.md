@@ -136,21 +136,23 @@ npm run lint
 npm run typecheck
 npm run build
 npm run test:security
+npm run test:privacy
 npm test
 npm run verify
 ```
 
-En Windows sin GNU Make, `npm run verify` es el equivalente exacto del target `make verify`. El workflow existente `.github/workflows/academic-evaluation.yml` ejecuta la validación en GitHub Actions cuando se publique una rama o se abra un Pull Request; todavía no se ha ejecutado para los cambios locales de Semana 9.
+En Windows sin GNU Make, `npm run verify` es el equivalente exacto del target `make verify`. La ejecución de GitHub Actions para el commit remoto `8f66413b93e4ad9f9231aeb214ed69b0cc0195b2` terminó correctamente el 31 de octubre de 2026 ([ver resultados](https://github.com/vanessahl/PWA-INSPECCIONES/actions/runs/41213642563)). Los cambios locales sin commit todavía requieren una nueva ejecución del workflow antes de entregar.
 
 ### Evidencia y límites
 
 * Modelo de amenazas y controles: [`docs/threat-model.md`](docs/threat-model.md).
 * Datos, finalidades, almacenamiento y retención: [`docs/privacy-data-inventory.md`](docs/privacy-data-inventory.md).
 * Pruebas deterministas con datos sintéticos: `tests/security.spec.ts` (`npm run test:security`).
+* Pruebas de eliminación local y conservación de otros registros: `tests/privacy-retention.spec.ts` (`npm run test:privacy`); también se ejecutan con `npm test`.
 * `public/robots.txt` solicita excluir `/api/` de rastreadores, pero no es un control de acceso.
 * El endpoint de demostración no tiene autenticación ni almacenamiento persistente. No introducir información personal, credenciales, ubicaciones o fotografías reales.
 
-Si el trabajo se realiza en equipo, consulten la [guía paso a paso para Vanne y Ángel](docs/week-09-team-guide.md). Cada integrante trabaja en su rama, documenta su evidencia individual y abre su propio Pull Request con base `dev`.
+Si el trabajo se realiza en equipo, cada integrante debe trabajar en su rama, documentar su evidencia individual y abrir su propio Pull Request con base `dev`.
 
 Los resultados de verificación se generan en:
 

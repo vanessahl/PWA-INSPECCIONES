@@ -26,7 +26,7 @@ La institución del escenario es un organismo público estatal en Puebla. Antes 
 3. Si no hay conexión, la cola conserva la inspección local para reintentar después. El Service Worker no almacena respuestas bajo `/api/`.
 4. Cámara/ubicación requieren acción y permiso explícitos. El archivo y la ubicación no se incorporan al registro de sincronización actual.
 
-No existe una función de borrado ni un plazo de expiración para IndexedDB. Los registros del servidor de demostración se pierden al reiniciar el proceso, lo cual no es una política de retención adecuada. Para datos reales habría que implementar retención aprobada, acceso por rol, borrado verificable en servidor y cliente, copias de seguridad alineadas y un proceso de atención a solicitudes e incidentes. Borrar caché o datos del navegador no garantiza borrar copias remotas.
+La aplicación permite eliminar manualmente una inspección y su tarea pendiente de IndexedDB, pero no hay vencimiento automático ni borrado remoto. Los registros del servidor de demostración se pierden al reiniciar el proceso, lo cual no es una política de retención adecuada. Para datos reales habría que implementar retención aprobada, acceso por rol, borrado verificable en servidor y cliente, copias de seguridad alineadas y un proceso de atención a solicitudes e incidentes. Borrar caché o datos del navegador no garantiza borrar copias remotas.
 
 ## No recolectar
 

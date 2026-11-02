@@ -294,3 +294,11 @@
 - **Limitaciones y fallos encontrados:** La eliminación realizada desde la aplicación solo afecta los datos almacenados localmente en el dispositivo. Si una inspección ya fue sincronizada, su copia en el servidor no se elimina. IndexedDB tampoco cifra automáticamente la información almacenada. Por eso, la aplicación sigue siendo demostrativa y se deben utilizar datos sintéticos.
 
 - **Uso de IA:** Utilicé ChatGPT como apoyo para comprender los cambios necesarios, revisar el código, preparar las pruebas y redactar la documentación. Revisé y ejecuté los cambios en mi proyecto, comprobando los resultados de las pruebas antes de realizar el commit.
+
+# Semana 9 - Angel Gabriel Guzman Miguel
+
+- **Aportación individual preparada:** Integración de las pruebas de privacidad ya existentes al flujo habitual del proyecto. Se agregó el comando `npm run test:privacy`, se incluyó en `npm test` y en la comprobación de tipos, y se actualizó `scripts/verify.mjs` para requerir y comprobar esas pruebas. También se documentó cómo ejecutarlas en `README.md`.
+- **Decisión técnica:** Mantener `tests/privacy-retention.spec.ts` como suite dedicada y ejecutarla tanto de forma independiente como junto con las pruebas generales. La verificación comprueba que la suite exista, pruebe `deleteLocal` y esté conectada a los comandos del proyecto.
+- **Verificación realizada en el entorno de trabajo:** `npm test` pasó, incluidas las 3 pruebas de privacidad; también pasaron `npm run typecheck`, `npm run lint`, `npm run verify` y `git diff --check`.
+- **Limitaciones:** Las pruebas de almacenamiento usan `fake-indexeddb`; no sustituyen pruebas manuales en varios navegadores. La eliminación sigue siendo local y no borra una copia ya sincronizada en el servidor.
+- **Estado y uso de IA:** Estos cambios se prepararon con Copilot SDK en VS Code a solicitud de la persona responsable del workspace. Están sin commit. Ángel debe revisar y confirmar esta atribución antes de presentar la evidencia como suya.

@@ -48,6 +48,7 @@ const required = [
   "docs/test-strategy.md",
   "docs/threat-model.md",
   "docs/privacy-data-inventory.md",
+  "tests/privacy-retention.spec.ts",
   "src/lib/security/headers.mjs",
   "src/lib/security/headers.d.mts",
   "src/lib/security/request.ts",
@@ -105,6 +106,9 @@ const capabilitiesTests = existsSync(resolve(root, "tests/capabilities.spec.ts")
 const securityTests = existsSync(resolve(root, "tests/security.spec.ts"))
   ? readFileSync(resolve(root, "tests/security.spec.ts"), "utf8")
   : "";
+const privacyTests = existsSync(resolve(root, "tests/privacy-retention.spec.ts"))
+  ? readFileSync(resolve(root, "tests/privacy-retention.spec.ts"), "utf8")
+  : "";
 const nextConfig = existsSync(resolve(root, "next.config.mjs"))
   ? readFileSync(resolve(root, "next.config.mjs"), "utf8")
   : "";
@@ -140,6 +144,9 @@ const checks = {
     /fallback/.test(capabilitiesTests),
   securityTestsRegistered: /test:security/.test(packageJson) &&
     /validateSyncPayload/.test(securityTests),
+  privacyTestsRegistered: /test:privacy/.test(packageJson) &&
+    /npm run test:privacy/.test(packageJson) &&
+    /deleteLocal/.test(privacyTests),
   securityHeadersConfigured: /getSecurityHeaders/.test(nextConfig)
 };
 const failedChecks = Object.entries(checks)
