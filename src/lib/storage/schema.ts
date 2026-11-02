@@ -44,46 +44,59 @@ export interface SyncStore {
   enqueueLocal(inspection: InspectionRecord, updatedAt: string, idempotencyKey: string): Promise<boolean>;
   listLocal(): Promise<StoredInspection[]>;
   listPending(): Promise<OutboxEntry[]>;
-  deleteLocal(inspectionId: string): Promise<void>;
   claimDue(now: number, leaseMs: number): Promise<OutboxEntry[]>;
   defer(entry: OutboxEntry): Promise<void>;
   markSynced(entry: OutboxEntry, remote: VersionedInspection): Promise<void>;
   adoptRemote(entryId: string, remote: VersionedInspection): Promise<void>;
 }
 
-const INSPECTION_FIELDS = new Set([
-  "id",
-  "location",
-  "date",
-  "inspector",
-  "status",
-  "statusLabel",
-  "findings",
-  "summary"
-]);
-
-function isBoundedText(value: unknown, maxLength: number): value is string {
-  return typeof value === "string" &&
-    value.trim().length > 0 &&
-    value.length <= maxLength &&
-    !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/.test(value);
-}
-
 export function isInspectionRecord(value: unknown): value is InspectionRecord {
-  if (typeof value !== "object" || value === null) return false;
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
   const keys = Object.keys(record);
-  if (keys.length !== INSPECTION_FIELDS.size || keys.some((key) => !INSPECTION_FIELDS.has(key))) return false;
+  const expectedKeys = [
+    "id",
+    "location",
+    "date",
+    "inspector",
+    "status",
+    "statusLabel",
+    "findings",
+    "summary"
+  ];
+
+  if (!keys.length || keys.length !== expectedKeys.length || !expectedKeys.every((key) => keys.includes(key))) {
+    return false;
+  }
 
   return (
-    isBoundedText(record.id, 128) &&
-    isBoundedText(record.location, 100) &&
-    isBoundedText(record.date, 40) && !Number.isNaN(Date.parse(record.date)) &&
-    isBoundedText(record.inspector, 80) &&
+    typeof record.id === "string" &&
+    record.id.length > 0 &&
+    record.id.length <= 128 &&
+    !/\u0000/.test(record.id) &&
+    typeof record.location === "string" &&
+    record.location.length > 0 &&
+    record.location.length <= 100 &&
+    !/\u0000/.test(record.location) &&
+    typeof record.date === "string" &&
+    record.date.length > 0 &&
+    !Number.isNaN(Date.parse(record.date)) &&
+    typeof record.inspector === "string" &&
+    record.inspector.length > 0 &&
+    record.inspector.length <= 80 &&
+    !/\u0000/.test(record.inspector) &&
     (record.status === "ok" || record.status === "attention") &&
-    isBoundedText(record.statusLabel, 80) &&
-    Number.isSafeInteger(record.findings) && (record.findings as number) >= 0 && (record.findings as number) <= 1000 &&
-    isBoundedText(record.summary, 500)
+    typeof record.statusLabel === "string" &&
+    record.statusLabel.length > 0 &&
+    record.statusLabel.length <= 80 &&
+    !/\u0000/.test(record.statusLabel) &&
+    Number.isInteger(record.findings) &&
+    (record.findings as number) >= 0 &&
+    (record.findings as number) <= 1000 &&
+    typeof record.summary === "string" &&
+    record.summary.length > 0 &&
+    record.summary.length <= 500 &&
+    !/\u0000/.test(record.summary)
   );
 }
 
@@ -174,17 +187,6 @@ export class IndexedDbSyncStore implements SyncStore {
       const request = tx.objectStore(OUTBOX_STORE).getAll();
       request.onsuccess = () => setResult(request.result as OutboxEntry[]);
     });
-  }
-  deleteLocal(inspectionId: string) {
-    return transaction<void>(
-      [INSPECTIONS_STORE, OUTBOX_STORE],
-      "readwrite",
-    (tx, setResult) => {
-        tx.objectStore(INSPECTIONS_STORE).delete(inspectionId);
-        tx.objectStore(OUTBOX_STORE).delete(inspectionId);
-        setResult(undefined);
-      }
-    );
   }
 
   claimDue(now: number, leaseMs: number) {

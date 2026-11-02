@@ -20,6 +20,11 @@ function isValidTimestamp(value: unknown): value is string {
     Number.isFinite(Date.parse(value));
 }
 
+function hasOnlyKeys(value: Record<string, unknown>, expected: readonly string[]): boolean {
+  const keys = Object.keys(value);
+  return keys.length === expected.length && expected.every((key) => keys.includes(key));
+}
+
 export async function readBoundedJson(
   request: Request,
   maxBytes = MAX_SYNC_BODY_BYTES
@@ -79,7 +84,8 @@ export function isValidIdempotencyKey(value: string | null): value is string {
 export function validateSyncPayload(value: unknown): SyncPayload | null {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return null;
   const payload = value as Record<string, unknown>;
-  const keys = Object.keys(payload);
+  if (!hasOnlyKeys(payload, ["inspection", "updatedAt", "expectedRevision"])) return null;
+
   const expectedRevision = payload.expectedRevision;
   const validExpectedRevision = expectedRevision === null
     ? null
@@ -88,14 +94,6 @@ export function validateSyncPayload(value: unknown): SyncPayload | null {
         expectedRevision >= 0
       ? expectedRevision
       : undefined;
-  if (
-    keys.length !== 3 ||
-    !keys.includes("inspection") ||
-    !keys.includes("updatedAt") ||
-    !keys.includes("expectedRevision")
-  ) {
-    return null;
-  }
 
   if (
     !isInspectionRecord(payload.inspection) ||
