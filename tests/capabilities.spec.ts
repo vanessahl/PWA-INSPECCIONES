@@ -109,6 +109,73 @@ try {
   assert.deepEqual(deniedNotification, { ok: true, mode: "fallback" });
   assert.equal(fallbackCalled, true, "muestra una alternativa cuando se rechaza la notificación");
 
+  // Permiso concedido: se crea la notificación nativa y no se usa el fallback.
+  const created: string[] = [];
+  class FakeNotification {
+    static permission: NotificationPermission = "granted";
+    static requestPermission = async () => "granted" as NotificationPermission;
+    constructor(title: string) { created.push(title); }
+  }
+  setNotification(FakeNotification as unknown as typeof Notification);
+  fallbackCalled = false;
+  assert.deepEqual(await notifyInspectionChange("Cambio concedido", {}, () => { fallbackCalled = true; }), { ok: true, mode: "notification" });
+  assert.deepEqual(created, ["Cambio concedido"]);
+  assert.equal(fallbackCalled, false);
+
+  // Permiso "default": se pide una vez y, si la persona acepta, se notifica.
+  let asked = 0;
+  FakeNotification.permission = "default";
+  FakeNotification.requestPermission = async () => { asked += 1; return "granted"; };
+  assert.equal((await notifyInspectionChange("Tras aceptar")).ok, true);
+  assert.equal(asked, 1);
+  assert.equal(created.at(-1), "Tras aceptar");
+
+  // Diálogo descartado: no se crea notificación y se usa el fallback.
+  FakeNotification.permission = "default";
+  FakeNotification.requestPermission = async () => "default";
+  const before = created.length;
+  fallbackCalled = false;
+  assert.deepEqual(await notifyInspectionChange("Descartado", {}, () => { fallbackCalled = true; }), { ok: true, mode: "fallback" });
+  assert.equal(created.length, before);
+  assert.equal(fallbackCalled, true);
+
+  // El constructor falla: se informa el fallo y se ejecuta el fallback.
+  class ThrowingNotification {
+    static permission: NotificationPermission = "granted";
+    static requestPermission = async () => "granted" as NotificationPermission;
+    constructor() { throw new Error("no disponible"); }
+  }
+  setNotification(ThrowingNotification as unknown as typeof Notification);
+  fallbackCalled = false;
+  assert.deepEqual(await notifyInspectionChange("Falla", {}, () => { fallbackCalled = true; }), { ok: false, reason: "failed" });
+  assert.equal(fallbackCalled, true);
+
+  // Geolocalización: éxito, timeout, fallo genérico.
+  setNavigator({
+    geolocation: {
+      getCurrentPosition: (success: PositionCallback) =>
+        success({ coords: { latitude: 1, longitude: 2, accuracy: 30 } } as GeolocationPosition)
+    }
+  } as unknown as Navigator);
+  const located = await getCurrentLocation();
+  assert.equal(located.ok, true);
+  if (located.ok) {
+    assert.deepEqual([located.location.latitude, located.location.longitude, located.location.accuracy], [1, 2, 30]);
+    assert.deepEqual(Object.keys(located.location).sort(), ["accuracy", "capturedAt", "latitude", "longitude"]);
+  }
+  for (const [code, reason] of [[3, "timeout"], [2, "failed"]] as const) {
+    setNavigator({
+      geolocation: { getCurrentPosition: (_s: PositionCallback, f?: PositionErrorCallback) => f?.({ code } as GeolocationPositionError) }
+    } as unknown as Navigator);
+    assert.deepEqual(await getCurrentLocation(), { ok: false, reason });
+  }
+
+  // Cámara: errores distintos al permiso se clasifican y los inesperados se propagan.
+  setNavigator({ mediaDevices: { getUserMedia: async () => { throw new DOMException("ocupada", "NotReadableError"); } } } as unknown as Navigator);
+  assert.equal(cameraFailureReason(new DOMException("ocupada", "NotReadableError")), "unavailable");
+  await assert.rejects(requestCameraStream());
+  assert.equal(cameraFailureReason(new Error("otro")), "failed");
+
   assert.equal(isInspectionRecord(syntheticInspection), true);
   let storedInspection: InspectionRecord | undefined;
   const optionalCapabilitiesStore = {
@@ -125,6 +192,11 @@ try {
   const inspectionPage = await readFile(resolve(root, "src/app/inspecciones/page.tsx"), "utf8");
   assert.match(inspectionPage, /setEvidenceName\(""\);\s*setLocationCapture\(null\);/s);
   assert.match(inspectionPage, /puedes guardar la inspección sin ella/);
+  assert.doesNotMatch(
+    inspectionPage.slice(inspectionPage.indexOf("const handleFileRequest")).split("const records")[0],
+    /requestCameraStream/,
+    "seleccionar archivo no depende del permiso de cámara"
+  );
 
   console.log("capabilities.spec.ts: PASS");
 } finally {

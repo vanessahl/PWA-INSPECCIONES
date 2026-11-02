@@ -12,7 +12,7 @@ export default function InspectionDetailPage({ params }: InspectionDetailPagePro
 
   return (
     <AppShell>
-      <main className="page-shell">
+      <main className="page-shell" id="contenido">
         {inspection ? (
           <article className="detail-panel">
             <p className="eyebrow">Detalle · renderizado en servidor</p>

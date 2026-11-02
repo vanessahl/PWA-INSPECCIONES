@@ -237,3 +237,68 @@
 - **Prueba ejecutada y resultado:** Revisé la documentación y preparé los casos de prueba manual para la pantalla de inspecciones. Realicé las pruebas manuales correspondientes a las funcionalidades de la aplicación y comprobé que funcionaran correctamente. Los resultados obtenidos fueron satisfactorios y coincidieron con lo esperado.
 - **Limitación:** Las pruebas de cámara y geolocalización dependen de que las funciones estén implementadas, de la compatibilidad del navegador y de los permisos concedidos por el usuario. 
 - **Uso de IA:** Utilicé ChatGPT como apoyo para organizar la documentación, comprender los casos de prueba manual y redactar el registro de resultados.
+
+# Semana 8 - Jessica Juárez Rodríguez
+
+- **Commit de mi aportación:** `9e6f5bbef832370bc1802c56eecdbe313fa189be`.
+- **Último commit de mi rama:** `ea4f3b23d7cf4adb954ce4e6dcee20cda105ad54`, en la rama `semana-08-jessica`. Este commit contiene la actualización de mi evidencia.
+- **Qué hice:** Agregué pruebas unitarias y de integración para revisar el funcionamiento sin conexión a internet y la sincronización de datos. También agregué pruebas E2E por HTTP y desde la interfaz, configuré las pruebas automáticas de GitHub Actions y actualicé la documentación de la Semana 8.
+- **Decisiones técnicas:** Utilicé `node:test` y `tsx` para las pruebas unitarias y de integración. También utilicé `fake-indexeddb` para probar el almacenamiento de datos y Playwright con Chromium para comprobar el funcionamiento de la aplicación desde un navegador.
+- **Pruebas que realicé inicialmente:** Ejecuté `npm ci`, la compilación del proyecto, `npm test`, las pruebas unitarias, las de integración, las pruebas E2E por HTTP y `npm run verify`. En esa primera versión todavía faltaban las pruebas desde un navegador y las pruebas para revisar qué sucede cuando se deniegan los permisos.
+- **Pruebas de la versión actual:** Ejecuté `npm ci`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm test`, las pruebas unitarias, las de integración, la cobertura de código, las pruebas E2E desde la interfaz y `npm run verify`. También revisé el comportamiento ante un error controlado.
+- **Resultados:** Las pruebas unitarias reportaron 19 casos y las de integración, 10. También se registraron 29 casos de cobertura y 2 escenarios de pruebas E2E desde la interfaz. La suite actual reporta 15 pruebas E2E aprobadas.
+- **Qué comprueban las pruebas:** Permiten revisar el funcionamiento sin conexión, la recarga de la aplicación, la reconexión y la alternativa que se muestra cuando se deniega el permiso de ubicación. Sin embargo, no garantizan el funcionamiento en todos los navegadores ni comprueban el uso real de la cámara, la ubicación o las notificaciones.
+- **Limitaciones:** El backend de demostración guarda algunos datos en memoria, por lo que estos se pierden al reiniciar el proceso. La denegación del permiso de ubicación se simula y no se utilizan datos personales. Además, la cobertura de código no incluye la interfaz ni el navegador.
+- **Uso de IA:** Utilicé Claude.AI como apoyo para revisar la estrategia de pruebas, agregar pruebas con Playwright, configurar las herramientas de revisión y corregir la evidencia.
+
+# Semana 8 - Ángel Gabriel Guzmán Miguel
+
+- **Commit de su aportación:** `1db41cf03f3b5f7d53c40db1b5f8d336f11b9801`. Este cambio integra el commit `d89d8b4afd70d4b872c5ba0690a2ff5ca665bb95` de su rama.
+- **Qué hizo:** Agregó el archivo `application-contract.test.ts` para comprobar las rutas de la aplicación, el manifest y el contrato de sincronización mediante solicitudes HTTP. También actualizó la documentación y la lista de pruebas.
+- **Decisión técnica:** Utilizó `node:test` y `next start` para comprobar las rutas y respuestas de la aplicación mediante HTTP, sin necesidad de abrir un navegador.
+- **Pruebas realizadas:** Ejecutó `npm run build`, `npm run test:e2e` y `npm run verify`. En su evidencia reportó 13 pruebas E2E aprobadas y un resultado `PASS` en la verificación de esa versión.
+- **Qué comprueban las pruebas:** Permiten comprobar que las rutas y el contrato de sincronización respondan correctamente mediante HTTP. Sin embargo, no comprueban la interacción con los controles de la interfaz desde un navegador.
+- **Limitaciones:** Sus pruebas no incluían la interacción con la interfaz desde un navegador. Además, el backend de demostración conserva los datos solamente mientras el proceso sigue funcionando.
+- **Uso de IA:** Declaró el uso de Codex/ChatGPT de OpenAI como apoyo para identificar qué debía probar, organizar las pruebas y redactar la documentación. También indicó que debía revisar el código y ejecutar los comandos para comprobar los resultados.
+
+# Semana 8 - Vanessa Hernández López
+
+- **Commit de su aportación:** `5fb81177cc4f471aa1aef48fd8124254b2cc3c5f`. Después, actualizó la documentación de la estrategia de pruebas en el commit `078d992`.
+- **Qué hizo:** Agregó el archivo `evidence.test.ts` para comprobar la validación de imágenes en formatos JPEG, PNG y WebP. También probó qué sucede cuando el archivo está vacío o supera el límite de 5 MiB. Además, actualizó el comando para ejecutar las pruebas unitarias y la documentación.
+- **Decisión técnica:** Utilizó `node:test` y `tsx` para realizar las pruebas sin agregar nuevas dependencias.
+- **Pruebas realizadas:** Ejecutó `npm run test:unit`, que reportó 19 pruebas; `npm run test:integration`, que reportó 10, y `npm run verify`, que terminó con el resultado `PASS`.
+- **Qué comprueban las pruebas:** Permiten revisar que la aplicación valide correctamente los archivos de imagen y comprobar los resultados de las pruebas de integración.
+- **Limitaciones:** Estas pruebas no comprueban por sí solas el funcionamiento de IndexedDB en todos los navegadores, la interfaz completa ni los permisos reales del dispositivo.
+- **Uso de IA:** Declaró el uso de ChatGPT como apoyo para revisar los resultados, configurar el comando de las pruebas unitarias y organizar la evidencia. También indicó que debía ejecutar los comandos para comprobar los resultados.
+
+# Semana 9 - Jessica Juárez Rodríguez
+
+- **Commit de implementación:** `79c2a8517403fbe9c315af6501b61324953b5c46`. El commit base de `dev` antes de los cambios es `3bedeed55be84080b771a8b877759e6f405dcd03`.
+- **Qué hice:** Agregué el modelo de amenazas y el inventario de datos; implementé encabezados de seguridad, validación estricta y acotada de solicitudes de sincronización, respuestas API no almacenables y `robots.txt`; amplié las pruebas y la verificación del repositorio.
+- **Decisión técnica:** Reutilicé el mismo módulo de encabezados en Next.js y en pruebas. La CSP de producción excluye `unsafe-eval`, aplica HSTS solo en producción y conserva `unsafe-inline`, requerido por la hidratación actual de Next.js. El endpoint rechaza cuerpos mayores de 16 KiB, campos inesperados, texto fuera de límites, controles y revisiones inválidas; no se añadieron credenciales porque el backend de demostración no consume servicios externos.
+- **Prueba ejecutada y resultado:** `npm ci --no-audit --no-fund` terminó correctamente. `npm run test:all` pasó lint, tipos, pruebas previas, 19 unitarias, 10 de integración, build, 29 casos de cobertura, 16 E2E y `npm run verify`. La suite nueva `npm run test:security` aprobó 5 pruebas, incluyendo la respuesta HTTP real con CSP, permisos y HSTS. `git diff --check` terminó sin errores.
+- **Limitaciones y fallos encontrados:** GitHub Actions todavía no se ha ejecutado para estos cambios. El endpoint sigue sin autenticación y usa memoria; IndexedDB no cifra ni elimina automáticamente sus datos, por lo que la app sigue siendo demostrativa y solo debe usarse con datos sintéticos. El escaneo de texto del kit reporta falsos positivos por una dependencia listada en el lockfile y una nota ya existente en `docs/capabilities.md`; no se cambiaron dependencias ni evidencia anterior para sortearlos. `npm ci` mostró avisos de paquetes obsoletos, sin impedir la instalación.
+- **Uso de IA:** Utilicé Copilot SDK en VS Code como apoyo para analizar el kit, proponer e implementar controles, redactar documentación y pruebas. 
+
+
+# Semana 9 - Vanessa Hernández López
+
+- **Commit de implementación:** `60218c57a7625ba9c28cebdda64aba2d4f1a81ec`
+
+- **Qué hice:** Implementé la eliminación local de inspecciones y de sus tareas pendientes de sincronización. Modifiqué `src/lib/storage/schema.ts` para agregar el método `deleteLocal`, que elimina ambos registros dentro de una misma transacción. También agregué una opción para eliminar inspecciones desde la pantalla principal, con un mensaje de confirmación y la posibilidad de cancelar. Actualicé el inventario de privacidad y agregué pruebas en `tests/privacy-retention.spec.ts`.
+
+- **Decisión técnica:** Realicé la eliminación de la inspección y su tarea pendiente de sincronización en una sola transacción de IndexedDB, para evitar que quede información relacionada sin eliminar. La eliminación se limita al dispositivo y no elimina una copia que ya se haya sincronizado con el servidor. También se conserva la información de las demás inspecciones.
+
+- **Prueba ejecutada y resultado:** Las tres pruebas nuevas de `tests/privacy-retention.spec.ts` pasaron correctamente. Se comprobó que se elimine la inspección junto con su tarea pendiente, que las demás inspecciones se conserven y que eliminar un registro inexistente no afecte otros registros. También probé manualmente la confirmación y cancelación desde la interfaz. `npm run lint`, `npm run typecheck`, `npm test` y `npm run verify` terminaron correctamente. Finalmente, `git diff --check` no reportó errores.
+
+- **Limitaciones y fallos encontrados:** La eliminación realizada desde la aplicación solo afecta los datos almacenados localmente en el dispositivo. Si una inspección ya fue sincronizada, su copia en el servidor no se elimina. IndexedDB tampoco cifra automáticamente la información almacenada. Por eso, la aplicación sigue siendo demostrativa y se deben utilizar datos sintéticos.
+
+- **Uso de IA:** Utilicé ChatGPT como apoyo para comprender los cambios necesarios, revisar el código, preparar las pruebas y redactar la documentación. Revisé y ejecuté los cambios en mi proyecto, comprobando los resultados de las pruebas antes de realizar el commit.
+
+# Semana 9 - Angel Gabriel Guzman Miguel
+
+- **Aportación individual preparada:** Integración de las pruebas de privacidad ya existentes al flujo habitual del proyecto. Se agregó el comando `npm run test:privacy`, se incluyó en `npm test` y en la comprobación de tipos, y se actualizó `scripts/verify.mjs` para requerir y comprobar esas pruebas. También se documentó cómo ejecutarlas en `README.md`.
+- **Decisión técnica:** Mantener `tests/privacy-retention.spec.ts` como suite dedicada y ejecutarla tanto de forma independiente como junto con las pruebas generales. La verificación comprueba que la suite exista, pruebe `deleteLocal` y esté conectada a los comandos del proyecto.
+- **Verificación realizada en el entorno de trabajo:** `npm test` pasó, incluidas las 3 pruebas de privacidad; también pasaron `npm run typecheck`, `npm run lint`, `npm run verify` y `git diff --check`.
+- **Limitaciones:** Las pruebas de almacenamiento usan `fake-indexeddb`; no sustituyen pruebas manuales en varios navegadores. La eliminación sigue siendo local y no borra una copia ya sincronizada en el servidor.
+- **Estado y uso de IA:** Estos cambios se prepararon con Copilot SDK en VS Code a solicitud de la persona responsable del workspace. Están sin commit. Ángel debe revisar y confirmar esta atribución antes de presentar la evidencia como suya.
